@@ -2,6 +2,7 @@ import { Form, Input, MaskedInput, Button, CustomProvider, ButtonGroup, InputNum
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
 import { NumberType, SchemaModel } from "schema-typed";
 import React from "react"
+import Head from 'next/head'
 
 const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
     const _formularioLimpio = {
@@ -28,7 +29,6 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
         x0: "Requerido",
         n: "Requerido",
     });
-    const [tablaValores, setTablaValores] = React.useState();
     const [valores_x, setValores_x] = React.useState();
     const [tamañoVentana, setTamañoVentana] = React.useState({
         width: 0,
@@ -72,6 +72,9 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
 
     return (
         <CustomProvider theme="dark">
+            <Head>
+                <title>Algoritmo Congruencial Multiplicativo</title>
+            </Head>
             <Container>
                 <Header>
                     <h3>Algoritmo Congruencial Multiplicativo</h3>
