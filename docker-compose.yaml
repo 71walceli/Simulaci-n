@@ -1,0 +1,32 @@
+
+version: '3.1'
+services:
+
+  uae_simulacion-tareas-dev:
+    container_name: uae_simulacion-tareas-dev
+    entrypoint: yarn run dev
+    hostname: uae_simulacion-tareas-dev
+    image: node:18
+    ports:
+      - 3000:3000/tcp
+    user: "1000:0"
+    volumes:
+      - ./uae-tareas-simulacion:/App
+    working_dir: /App
+
+  uae_simulacion-tareas-produccion:
+    container_name: uae_simulacion-tareas-produccion
+    entrypoint: yarn run start
+    hostname: uae_simulacion-tareas-produccion
+    image: node:18
+    networks:
+      - 71walceli_https-proxy
+    user: "1000:0"
+    volumes:
+      - ./uae-tareas-simulacion:/App
+    working_dir: /App
+
+networks:
+  71walceli_https-proxy: 
+    external: true
+
