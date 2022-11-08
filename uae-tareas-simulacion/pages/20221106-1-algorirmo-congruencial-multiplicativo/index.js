@@ -19,10 +19,11 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
         x0: NumberType("requerido").range(1, 10000000000, "Debe ser positivo")
             .isRequired("Requerido"),
         n: NumberType("requerido").range(1, 10000000000, "Debe ser positivo")
-            .isRequired("Requerido"),
+            .isInteger("Debe ser entero.").isRequired("Requerido"),
     });
     const formulario = React.useRef();
     const [datosFormulario, setDatosFormulario] = React.useState(_formularioLimpio);
+    const [parametrosAlgoritmo, setParametrosAlgoritmo] = React.useState(_formularioLimpio);
     const [erroresFormulario, setErroresFormulario] = React.useState({
         a: "Requerido",
         m: "Requerido",
@@ -50,6 +51,7 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
             _valores_x.push(x_actual);
         }
         setValores_x(_valores_x);
+        setParametrosAlgoritmo(datosFormulario)
     };
 
     const adjustSizes = () => {
@@ -132,7 +134,11 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
                                         <Tr key={índice}>
                                             <Td>{índice}</Td>
                                             <Td>{valores}</Td>
-                                            <Td className="redondear">{valores / Number(datosFormulario.m)}</Td>
+                                            <Td>
+                                                <div className="redondear">
+                                                    {valores / Number(parametrosAlgoritmo.m)}
+                                                </div>
+                                            </Td>
                                         </Tr>
                                     ))}
                                 </Tbody>
