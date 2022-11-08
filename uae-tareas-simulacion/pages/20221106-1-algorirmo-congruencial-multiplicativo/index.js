@@ -12,23 +12,23 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
         n: "0",
     };
     const _esquemaFormulario = SchemaModel({
-        a: NumberType("requerido").range(1, 10000000000, "Debe ser positivo")
+        a: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
             .isRequired("Requerido"),
-        m: NumberType("requerido").range(1, 10000000000, "Debe ser positivo")
+        m: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
             .isRequired("Requerido"),
-        x0: NumberType("requerido").range(1, 10000000000, "Debe ser positivo")
+        x0: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
             .isRequired("Requerido"),
-        n: NumberType("requerido").range(1, 10000000000, "Debe ser positivo")
+        n: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
             .isInteger("Debe ser entero.").isRequired("Requerido"),
     });
     const formulario = React.useRef();
     const [datosFormulario, setDatosFormulario] = React.useState(_formularioLimpio);
     const [parametrosAlgoritmo, setParametrosAlgoritmo] = React.useState(_formularioLimpio);
     const [erroresFormulario, setErroresFormulario] = React.useState({
-        a: "Requerido",
-        m: "Requerido",
-        x0: "Requerido",
-        n: "Requerido",
+        a: "Requerido", 
+        m: "Requerido", 
+        x0: "Requerido", 
+        n: "Requerido", 
     });
     const [valores_x, setValores_x] = React.useState();
     const [tamañoVentana, setTamañoVentana] = React.useState({
