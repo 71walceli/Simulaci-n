@@ -37,6 +37,39 @@ div {
 .rs-form-horizontal [class*=rs-input-] {
   max-width: 200px;
 }
+td [class*=rs-input-] {
+  max-width: 100%;
+}
+td .rs-form-control {
+  margin: 3px;
+  text-align: center;
+}
+/* TODO Definir estilos tipo boostram */
+.rs-btn-group {
+  padding: 1em;
+}
+.padding-iem {
+  padding: 1em;
+}
+.padding-iem-south {
+  padding-bottom: 1em;
+}
+
+.centrar {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.derecha {
+  text-align: left;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.rs-message {
+  max-width: 75%;
+  margin: 1em auto;
+}
 
 .redondear {
   width: min-content;
@@ -54,6 +87,9 @@ th, td {
 @media screen and (max-width: 40em) {
   .responsiveTable tbody tr {
       border: 1px solid gray;
+  }
+  .rs-message {
+    max-width: 100%;
   }
 }
 
