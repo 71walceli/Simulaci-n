@@ -9,21 +9,21 @@ services:
     image: node:18
     ports:
       - 3000:3000/tcp
-    user: "1000:0"
+    user: "1000:1000"
     volumes:
       - ./uae-tareas-simulacion:/App
     working_dir: /App
 
   uae_simulacion-tareas-produccion:
+    build: ./uae-tareas-simulacion
     container_name: uae_simulacion-tareas-produccion
     entrypoint: yarn run start
     hostname: uae_simulacion-tareas-produccion
-    image: node:18
+    image: uae_simulacion/tareas-produccion
     networks:
       - 71walceli_https-proxy
-    user: "1000:0"
-    volumes:
-      - ./uae-tareas-simulacion:/App
+    user: "1000:1000"
+    restart: unless-stopped
     working_dir: /App
 
 networks:
