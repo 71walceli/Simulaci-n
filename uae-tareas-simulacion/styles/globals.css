@@ -86,7 +86,7 @@ th, td {
 
 @media screen and (max-width: 40em) {
   .responsiveTable tbody tr {
-      border: 1px solid gray;
+    border: 1px solid gray;
   }
   .rs-message {
     max-width: 100%;
