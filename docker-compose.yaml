@@ -7,8 +7,6 @@ services:
     entrypoint: yarn run dev
     hostname: uae_simulacion-tareas-dev
     image: node:18
-    ports:
-      - 3000:3000/tcp
     user: "1000:1000"
     volumes:
       - ./uae-tareas-simulacion:/App
