@@ -93,13 +93,3 @@ th, td {
   }
 }
 
-/*
-@media (max-width: 420px) {
-  .rs-form-label {
-    max-width: 100%;
-  }
-  [class*=rs-input-] {
-    max-width: 100%;
-  }
-}
-*/
