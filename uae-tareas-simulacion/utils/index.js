@@ -10,3 +10,14 @@ String.prototype.hashCode = function() {
     return hash;
 }
 
+export const factorial = (n) => {
+  let acomulado = 1
+  while (true) {
+    if (n <= 1)
+      return acomulado;
+    acomulado = acomulado*n;
+    if (acomulado > Number.MAX_VALUE)
+      return Number.MAX_VALUE
+    n--
+  }
+}
