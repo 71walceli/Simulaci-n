@@ -6,6 +6,7 @@ COPY ./package.json .
 COPY ./yarn.lock .
 
 RUN yarn install --production
+RUN yes | npx browserslist@latest --update-db
 
 # Bundle app source
 COPY ./ ./
