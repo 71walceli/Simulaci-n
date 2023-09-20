@@ -13,7 +13,7 @@ services:
     build: ./uae-tareas-simulacion
     entrypoint: yarn run start
     hostname: uae_simulacion-tareas-produccion
-    image: uae_simulacion/tareas-produccion
+    image: uae_simulacion/tareas-produccion:0.1
     networks:
       - https-proxy
     user: "1000:1000"
