@@ -1,5 +1,5 @@
 import { 
-  Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content, Divider 
+  Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content, Divider, PanelGroup, Panel 
 } from "rsuite"
 import { Table as SuperResponsiveTable, Thead, Tbody, Tr, Th, Td } 
   from 'react-super-responsive-table'
@@ -7,6 +7,11 @@ import { NumberType, SchemaModel } from "schema-typed";
 import React from "react"
 import Head from 'next/head'
 import { factorial } from "../../utils";
+import { useWindowSize } from "../../hooks/useWindowSize";
+import { ResponsiveTable } from "../../Components/ResponsiveTable";
+import { Accordion } from "../../Components/Accordion";
+import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
+
 
 const _20230116_1_dostribucion_poison = (props) => {
   const _formularioLimpio = {
@@ -28,11 +33,7 @@ const _20230116_1_dostribucion_poison = (props) => {
     probabilidad: "Requerido",
     noSimulaciones: "Requerido",
   });
-  // TODO put ii in its own hook
-  const [tamañoVentana, setTamañoVentana] = React.useState({
-    width: 0,
-    height: 0,
-  });
+  const windowSize = useWindowSize();
 
   const calcular = () => {
     const poisson = (i) => Math.E ** -promedio * promedio ** i / factorial(i)
@@ -83,30 +84,14 @@ const _20230116_1_dostribucion_poison = (props) => {
     setResultados({ resultados, conteos })
   };
 
-  // TODO Import from another hook
-  const adjustSizes = () => {
-    setTamañoVentana({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
-
   React.useEffect(() => {
     if (formulario.current) {
       formulario.current.check();
     }
-    window.addEventListener("resize", adjustSizes);
     return () => {
-      window.removeEventListener("resize", adjustSizes);
       formulario.current = null;
     };
   }, [formulario]);
-
-  const tableStyle = {
-    maxHeight: "calc(100vh - 48px)",
-    overflowY: "auto",
-    width: "auto",
-  }
 
   return (
     <CustomProvider theme="dark">
@@ -123,7 +108,7 @@ const _20230116_1_dostribucion_poison = (props) => {
           <Content style={{
             textAlign: "center",
           }}>
-            <Form layout={tamañoVentana.width > 420 && "horizontal" || "vertical"}
+            <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
               formValue={datosFormulario} formError={erroresFormulario}
               model={_esquemaFormulario}
               onChange={setDatosFormulario} onCheck={setErroresFormulario}
@@ -150,89 +135,23 @@ const _20230116_1_dostribucion_poison = (props) => {
             </Form>
             {/* TODO Hcer componente de tablas estándar */}
             {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Distribución de probabilidad</h4>
-                <div style={tableStyle}>
-                  <SuperResponsiveTable style={{
-                    maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                    margin: "0 auto"
-                  }}>
-                    <Thead>
-                      <Tr>
-                        <Th>i</Th>
-                        <Th>Probabilidad</Th>
-                        <Th>Prob. acumulada</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {parametrosAlgoritmo.funcionProbabilidad.map((valores) => (
-                        <Tr key={valores.i}>
-                          <Td>{valores.i}</Td>
-                          <Td>{valores.probabilidad}</Td>
-                          <Td>{valores.probabilidadAcumulada}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </SuperResponsiveTable>
-                </div>
-              </div>
+              <Accordion header="Distribución de probabilidad" defaultExpanded>
+                <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
+                  rows={parametrosAlgoritmo.funcionProbabilidad}
+                />
+              </Accordion>
             )}
             {resultados?.resultados?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Resultados de simulación</h4>
-                <div style={tableStyle}>
-                  <SuperResponsiveTable style={{
-                    maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                    margin: "0 auto"
-                  }}>
-                    <Thead>
-                      <Tr>
-                        <Th>#</Th>
-                        <Th>U(0, 1)</Th>
-                        <Th>X</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {resultados.resultados.map((valores, índice) => (
-                        <Tr key={índice}>
-                          <Td>{índice}</Td>
-                          <Td>{valores.u}</Td>
-                          <Td>{valores.x}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </SuperResponsiveTable>
-                </div>
-              </div>
+              <Accordion header="Resultados de simulación" style={{ marginTop: "2em" }}>
+                <ResponsiveTable columns={randomNumbers.columns}
+                  rows={resultados.resultados}
+                />
+              </Accordion>
             )}
             {resultados?.conteos?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Conteo de valores</h4>
-                <div style={tableStyle}>
-                  <SuperResponsiveTable style={{
-                    maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                    margin: "0 auto"
-                  }}>
-                    <Thead>
-                      <Tr>
-                        <Th>i</Th>
-                        <Th>Conteo</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {resultados.conteos.map((valores) => (
-                        <Tr key={valores.i}>
-                          <Td>{valores.i}</Td>
-                          <Td>{valores.conteo}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </SuperResponsiveTable>
-                </div>
-              </div>
+              <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
+                <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
+              </Accordion>
             )}
           </Content>
         </Container>

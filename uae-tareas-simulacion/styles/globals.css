@@ -85,11 +85,21 @@ th, td {
 }
 
 @media screen and (max-width: 40em) {
-  .responsiveTable tbody tr {
-    border: 1px solid gray;
-  }
   .rs-message {
     max-width: 100%;
+  }
+}
+
+:root, .rs-theme-light {
+  --global-bg-color: white;
+}
+.rs-theme-dark {
+  --global-bg-color: #222;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #222;
+    color: #fff;
   }
 }
 

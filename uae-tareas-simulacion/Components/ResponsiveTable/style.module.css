@@ -1,0 +1,16 @@
+
+/* @import url('~react-super-responsive-table/dist/SuperResponsiveTableStyle.css'); */
+
+.responsiveTable thead {
+  position: sticky;
+  top: 0px;
+  background-color: var(--global-bg-color);
+}
+
+.responsiveTable tbody tr {
+  border: 1px solid gray;
+}
+
+.responsiveTable tbody tr:nth-child(even) {
+  background-color: #8882;
+}

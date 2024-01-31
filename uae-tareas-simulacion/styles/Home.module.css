@@ -70,7 +70,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  max-width: 800px;
+  max-width: 1200px;
 }
 
 .card {
@@ -125,5 +125,9 @@
   }
   .logo img {
     filter: invert(1);
+  }
+  .main {
+    /* background-color: #111; */
+    color: #eaeaea;
   }
 }

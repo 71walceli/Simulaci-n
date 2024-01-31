@@ -1,8 +1,16 @@
-import { Form, Input, MaskedInput, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Sidebar, Content, Divider } from "rsuite"
-import { Table as SuperResponsiveTable, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
+import { 
+  Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content, Divider 
+} from "rsuite"
+import { Table as SuperResponsiveTable, Thead, Tbody, Tr, Th, Td } 
+  from 'react-super-responsive-table'
 import { NumberType, SchemaModel } from "schema-typed";
 import React from "react"
 import Head from 'next/head'
+import { useWindowSize } from "../../hooks/useWindowSize";
+import { Accordion } from "../../Components/Accordion";
+import { ResponsiveTable } from "../../Components/ResponsiveTable";
+import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
+
 
 const _20221230_1_simulador_distribucion_geometroca = (props) => {
   const _formularioLimpio = {
@@ -23,22 +31,8 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
     probabilidad: "Requerido",
     noSimulaciones: "Requerido",
   });
-  const [valores_x, setValores_x] = React.useState();
   // TODO put ii in its own hook
-  const [tamañoVentana, setTamañoVentana] = React.useState({
-    width: 0,
-    height: 0,
-  });
-
-  // TODO Refactor to be less reliant on recursion
-  const factorial = (n) => {
-    if (n <= 1)
-      return 1;
-    return n * factorial(n - 1);
-  }
-
-  // Function to calculate the value of nCr
-  const calculate_nCr = (n, r) => factorial(n) / (factorial(r) * factorial(n - r))
+  const windowSize = useWindowSize();
 
   const calcular = () => {
     const probabilidad = Number(datosFormulario.probabilidad);
@@ -80,21 +74,11 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
     setResultados({ resultados, conteos })
   };
 
-  // TODO Import from another hook
-  const adjustSizes = () => {
-    setTamañoVentana({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
-
   React.useEffect(() => {
     if (formulario.current) {
       formulario.current.check();
     }
-    window.addEventListener("resize", adjustSizes);
     return () => {
-      window.removeEventListener("resize", adjustSizes);
       formulario.current = null;
     };
   }, [formulario]);
@@ -119,7 +103,7 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
           <Content style={{
             textAlign: "center",
           }}>
-            <Form layout={tamañoVentana.width > 420 && "horizontal" || "vertical"}
+            <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
               formValue={datosFormulario} formError={erroresFormulario}
               model={_esquemaFormulario}
               onChange={setDatosFormulario} onCheck={setErroresFormulario}
@@ -147,89 +131,23 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
             </Form>
             {/* TODO Hcer componente de tablas estándar */}
             {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Distribución Geométrica</h4>
-                <div style={tableStyle}>
-                  <SuperResponsiveTable style={{
-                    maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                    margin: "0 auto"
-                  }}>
-                    <Thead>
-                      <Tr>
-                        <Th>i</Th>
-                        <Th>Probabilidad</Th>
-                        <Th>Prob. acumulada</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {parametrosAlgoritmo.funcionProbabilidad.map((valores) => (
-                        <Tr key={valores.i}>
-                          <Td>{valores.i}</Td>
-                          <Td>{valores.probabilidad}</Td>
-                          <Td>{valores.probabilidadAcumulada}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </SuperResponsiveTable>
-                </div>
-              </div>
+              <Accordion header="Distribución Geométrica" defaultExpanded>
+                <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
+                  rows={parametrosAlgoritmo.funcionProbabilidad}
+                />
+              </Accordion>
             )}
             {resultados?.resultados?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Resultados de simulación</h4>
-                <div style={tableStyle}>
-                  <SuperResponsiveTable style={{
-                    maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                    margin: "0 auto"
-                  }}>
-                    <Thead>
-                      <Tr>
-                        <Th>#</Th>
-                        <Th>U(0, 1)</Th>
-                        <Th>X</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {resultados.resultados.map((valores, índice) => (
-                        <Tr key={índice}>
-                          <Td>{índice}</Td>
-                          <Td>{valores.u}</Td>
-                          <Td>{valores.x}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </SuperResponsiveTable>
-                </div>
-              </div>
+              <Accordion header="Resultados de simulación" style={{ marginTop: "1em" }}>
+                <ResponsiveTable columns={randomNumbers.columns} 
+                  rows={resultados.resultados}
+                />
+              </Accordion>
             )}
             {resultados?.conteos?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Conteo de valores</h4>
-                <div style={tableStyle}>
-                  <SuperResponsiveTable style={{
-                    maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                    margin: "0 auto"
-                  }}>
-                    <Thead>
-                      <Tr>
-                        <Th>i</Th>
-                        <Th>Conteo</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {resultados.conteos.map((valores) => (
-                        <Tr key={valores.i}>
-                          <Td>{valores.i}</Td>
-                          <Td>{valores.conteo}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </SuperResponsiveTable>
-                </div>
-              </div>
+              <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
+                <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
+              </Accordion>
             )}
           </Content>
         </Container>

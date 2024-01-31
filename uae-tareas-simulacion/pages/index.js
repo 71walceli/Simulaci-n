@@ -2,22 +2,33 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
+
 export default function Home() {
   const SIMULADORES = [
     {
-      abreviatura: "ACM",
+      abreviatura: "A. C. M.",
       titulo: "Algoritmo Congruencial Multiplicativo",
       url: "/20221106-1-algorirmo-congruencial-multiplicativo/",
     },
     {
-      abreviatura: "MTI",
+      abreviatura: "M. T. I.",
       titulo: "Método de Transformación Inversa",
-      url: "/20221106-1-algorirmo-congruencial-multiplicativo/",
+      url: "/20221114-1-metodo-tranformacion-inversa/",
     },
     {
-      abreviatura: "Distribución Binomial",
+      abreviatura: "Dist. Binomial",
       titulo: "Simulador Distribución Binomial",
       url: "/20221219-2-simulador-distribucion-binomial/",
+    },
+    {
+      abreviatura: "Dist. Poisson",
+      titulo: "Simulador Distribución Poisson",
+      url: "/20230116-1-dostribucion-poison/",
+    },
+    {
+      abreviatura: "Dist. Geométrica",
+      titulo: "Simulador Distribución Geométrica",
+      url: "/20221230-1-simulador-distribucion-geometroca/",
     },
   ]
 
@@ -31,13 +42,8 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Learn <a href="https://nextjs.org">Next.js!</a>
+          Simuladores de Probabilidad
         </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
         <div className={styles.grid}>
           {SIMULADORES.map(link => (
             <a kay={link.url} href={link.url} className={styles.card}>
@@ -49,6 +55,11 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
+        <p>
+          Por Walter Anthony Celi Vaca<br />
+          Ingeniería en Ciencias de la Computación<br />
+          Universidad Agraria del Ecuador<br />
+        </p>
         <a
           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
           target="_blank"

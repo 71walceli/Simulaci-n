@@ -3,6 +3,12 @@ import { Table as SuperResponsiveTable, Thead, Tbody, Tr, Th, Td } from 'react-s
 import { NumberType, SchemaModel } from "schema-typed";
 import React from "react"
 import Head from 'next/head'
+import { factorial } from "../../utils";
+import { useWindowSize } from "../../hooks/useWindowSize";
+import { Accordion } from "../../Components/Accordion";
+import { ResponsiveTable } from "../../Components/ResponsiveTable";
+import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
+
 
 const _20221219_2_simulador_distribucion_binomial = (props) => {
   const _formularioLimpio = {
@@ -29,17 +35,7 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
   });
   const [valores_x, setValores_x] = React.useState();
   // TODO put ii in its own hook
-  const [tamañoVentana, setTamañoVentana] = React.useState({
-    width: 0,
-    height: 0,
-  });
-
-  // TODO Refactor to be less reliant on recursion
-  const factorial = (n) => {
-    if (n <= 1)
-      return 1;
-    return n * factorial(n - 1);
-  }
+  const windowSize = useWindowSize();
 
   // Function to calculate the value of nCr
   const calculate_nCr = (n, r) => factorial(n) / (factorial(r) * factorial(n - r))
@@ -96,21 +92,11 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
     setResultados({ resultados, conteos })
   };
 
-  // TODO 
-  const adjustSizes = () => {
-    setTamañoVentana({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
-
   React.useEffect(() => {
     if (formulario.current) {
       formulario.current.check();
     }
-    window.addEventListener("resize", adjustSizes);
     return () => {
-      window.removeEventListener("resize", adjustSizes);
       formulario.current = null;
     };
   }, [formulario]);
@@ -130,7 +116,7 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
           <Content style={{
             textAlign: "center",
           }}>
-            <Form layout={tamañoVentana.width > 420 && "horizontal" || "vertical"}
+            <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
               formValue={datosFormulario} formError={erroresFormulario}
               model={_esquemaFormulario}
               onChange={setDatosFormulario} onCheck={setErroresFormulario}
@@ -162,84 +148,24 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
                 </Button>
               </ButtonGroup>
             </Form>
-            {/* TODO Hcer componente de tablas estándar */}
             {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Distribución Binomial</h4>
-                <SuperResponsiveTable style={{
-                  maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                  margin: "0 auto"
-                }}>
-                  <Thead>
-                    <Tr>
-                      <Th>i</Th>
-                      <Th>P</Th>
-                      <Th>P acum.</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {parametrosAlgoritmo.funcionProbabilidad.map((valores) => (
-                      <Tr key={valores.i}>
-                        <Td>{valores.i}</Td>
-                        <Td>{valores.probabilidad}</Td>
-                        <Td>{valores.probabilidadAcumulada}</Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </SuperResponsiveTable>
-              </div>
+              <Accordion header="Distribución de probabilidad" defaultExpanded>
+                <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
+                  rows={parametrosAlgoritmo.funcionProbabilidad}
+                />
+              </Accordion>
             )}
             {resultados?.resultados?.length > 0 && (
-              <div>
-                <Divider />
-                <h4>Resultados de simulación</h4>
-                <SuperResponsiveTable style={{
-                  maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                  margin: "0 auto"
-                }}>
-                  <Thead>
-                    <Tr>
-                      <Th>#</Th>
-                      <Th>U(0, 1)</Th>
-                      <Th>X</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {resultados.resultados.map((valores, índice) => (
-                      <Tr key={índice}>
-                        <Td>{índice}</Td>
-                        <Td>{valores.u}</Td>
-                        <Td>{valores.x}</Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </SuperResponsiveTable>
-              </div>
+              <Accordion header="Resultados de simulación" style={{ marginTop: "2em" }}>
+                <ResponsiveTable columns={randomNumbers.columns}
+                  rows={resultados.resultados}
+                />
+              </Accordion>
             )}
             {resultados?.conteos?.length > 0 && (
-              <div>
-                <h4>Conteo de valores</h4>
-                <SuperResponsiveTable style={{
-                  maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                  margin: "0 auto"
-                }}>
-                  <Thead>
-                    <Tr>
-                      <Th>i</Th>
-                      <Th>Conteo</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {resultados.conteos.map((valores) => (
-                      <Tr key={valores.i}>
-                        <Td>{valores.i}</Td>
-                        <Td>{valores.conteo}</Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </SuperResponsiveTable>
-              </div>
+              <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
+                <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
+              </Accordion>
             )}
           </Content>
         </Container>

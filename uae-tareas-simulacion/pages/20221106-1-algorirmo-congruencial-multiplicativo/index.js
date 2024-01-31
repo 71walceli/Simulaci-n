@@ -3,6 +3,10 @@ import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
 import { NumberType, SchemaModel } from "schema-typed";
 import React from "react"
 import Head from 'next/head'
+import { useWindowSize } from "../../hooks/useWindowSize";
+import { ResponsiveTable } from "../../Components/ResponsiveTable";
+import { randomNumbers } from "../../data/formats";
+
 
 const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
     const _formularioLimpio = {
@@ -31,10 +35,7 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
         n: "Requerido", 
     });
     const [valores_x, setValores_x] = React.useState();
-    const [tamañoVentana, setTamañoVentana] = React.useState({
-        width: 0,
-        height: 0,
-    });
+    const windowSize = useWindowSize();
 
     const calcular = () => {
         const var_a = Number(datosFormulario.a);
@@ -54,20 +55,11 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
         setParametrosAlgoritmo(datosFormulario)
     };
 
-    const adjustSizes = () => {
-        setTamañoVentana({
-            width: window.innerWidth,
-            height: window.innerHeight,
-        });
-    };
-
     React.useEffect(() => {
         if (formulario.current) {
             formulario.current.check();
         }
-        window.addEventListener("resize", adjustSizes);
         return () => {
-            window.removeEventListener("resize", adjustSizes);
             formulario.current = null;
         };
     }, [formulario]);
@@ -87,7 +79,7 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
                     <Content style={{
                         textAlign: "center",
                     }}>
-                        <Form layout={tamañoVentana.width > 420 && "horizontal" || "vertical"}
+                        <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
                             formValue={datosFormulario} formError={erroresFormulario}
                             model={_esquemaFormulario}
                             onChange={setDatosFormulario} onCheck={setErroresFormulario}
@@ -118,31 +110,10 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
                             </ButtonGroup>
                         </Form>
                         {valores_x &&
-                            <Table style={{
-                                maxWidth: (tamañoVentana.width > 480) && "75%" || "100%",
-                                margin: "0 auto"
-                            }}>
-                                <Thead>
-                                    <Tr>
-                                        <Th>#</Th>
-                                        <Th>X</Th>
-                                        <Th>U(0, 1)</Th>
-                                    </Tr>
-                                </Thead>
-                                <Tbody>
-                                    {valores_x.map((valores, índice) => (
-                                        <Tr key={índice}>
-                                            <Td>{índice}</Td>
-                                            <Td>{valores}</Td>
-                                            <Td>
-                                                <div className="redondear">
-                                                    {valores / Number(parametrosAlgoritmo.m)}
-                                                </div>
-                                            </Td>
-                                        </Tr>
-                                    ))}
-                                </Tbody>
-                            </Table>}
+                            <ResponsiveTable columns={randomNumbers.columns} 
+                                rows={valores_x.map(x => ({ x, u: x / Number(parametrosAlgoritmo.m) }))} 
+                            />
+                        }
                     </Content>
                 </Container>
             </Container>

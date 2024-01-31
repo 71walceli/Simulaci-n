@@ -2,7 +2,7 @@ import {
   CustomProvider, Container, Header, Content, Form, InputNumber, ButtonGroup, Button, Divider, 
   Message, Steps
 } from "rsuite"
-import { Table as ResponsiveTable, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
+import { Table as SuperResponsiveTable, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
 import { SchemaModel, NumberType } from "schema-typed"
 import { faArrowAltCircleLeft } from "@fortawesome/free-regular-svg-icons/faArrowAltCircleLeft"
 import { faArrowAltCircleRight } from "@fortawesome/free-regular-svg-icons/faArrowAltCircleRight"
@@ -11,6 +11,10 @@ import React from "react"
 import Head from 'next/head'
 
 import "../../utils/"
+import { useWindowSize } from "../../hooks/useWindowSize"
+import { ResponsiveTable } from "../../Components/ResponsiveTable"
+import { randomNumbers } from "../../data/formats"
+
 
 const _20221114_1_metodo_tranformacion_inversa = (props) => {
   //#region configuracion
@@ -57,10 +61,7 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
       n: "Requerido",
     },
   });
-  const [tamañoVentana, setTamañoVentana] = React.useState({
-    width: 0,
-    height: 0,
-  });
+  const windowSize = useWindowSize();
   const [pasoAsistente, setPasoAsistente] = React.useState(0)
 
   const generarEsquemaFuncionProbabilidad = React.useCallback(() => {
@@ -92,8 +93,8 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
     }
     , [datosFormulario.funcionProbabilidad, parametros.cantidadNumeros]
   )
-  funcionProbabilidad.sumatoriaProbabilidades = () => funcionProbabilidad.generarParametros()
-    .reduce( (probabilidad1, asociacion) => probabilidad1+asociacion.p , 0),
+  funcionProbabilidad.sumatoriaProbabilidades = () => Number(funcionProbabilidad.generarParametros()
+    .reduce( (probabilidad1, asociacion) => probabilidad1+asociacion.p ,  0 ).toFixed(7)),
   funcionProbabilidad.validacioesAdicionales = React.useCallback(() => {
     const validaciones =
       [
@@ -130,14 +131,6 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
     return validaciones.map(regla => !regla.criterio() && regla.mensaje).filter(error => error)
   }, [datosFormulario.funcionProbabilidad, parametros.cantidadNumeros])
 
-  // TODO Put away in its own hook
-  const actualizarTamañoVentana = () => {
-    setTamañoVentana({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
-
   // TODO Poner en su propio componente
   const BotonAtras = React.forwardRef((props, ref) => (
     <Button appearance="ghost" ref={ref} {...props}>
@@ -146,6 +139,7 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
       Anterior
     </Button>
   ))
+  BotonAtras.displayName = "BotonAtras"
   const BotonSiguiente = React.forwardRef((props, ref) => (
     <Button appearance="primary" color="green" ref={ref} {...props}>
       Siguiente
@@ -153,18 +147,16 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
       <FontAwesomeIcon icon={faArrowAltCircleRight} />
     </Button>
   ))
+  BotonSiguiente.displayName = "BotonSiguiente"
 
   React.useEffect(() => {
-    actualizarTamañoVentana()
     formularioCantidadNumeros.current?.check();
     formularioDatosFuncionProbabilidad.current?.check();
     formularioParametrosSimulacion.current?.check();
-    window.addEventListener("resize", actualizarTamañoVentana);
     return () => {
       formularioCantidadNumeros.current = null;
       formularioDatosFuncionProbabilidad.current = null;
       formularioParametrosSimulacion.current = null;
-      window.removeEventListener("resize", actualizarTamañoVentana);
     };
   }, [formularioCantidadNumeros, formularioDatosFuncionProbabilidad, formularioParametrosSimulacion]);
   //#endregion
@@ -185,13 +177,15 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
             textAlign: "center",
           }}>
             <Steps current={pasoAsistente} className="padding-iem-south"
-              vertical={tamañoVentana.width < 600}
+              vertical={windowSize.width < 600}
             >
+              {/* TODO Add click handler */}
               <Steps.Item title="Cantidad de datos" />
               <Steps.Item title="Función de probabilidad" />
               <Steps.Item title="Parámetros de simulación" />
               <Steps.Item title="Resultados" />
             </Steps>
+            {/* TODO Add buttons at botton, don't repeat them */}
             {pasoAsistente === 0 && 
               <div>
                 <Form
@@ -268,7 +262,7 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
             {pasoAsistente === 1 && parametros.cantidadNumeros > 0 &&
               <div>
                 <Divider />
-                <Form layout={tamañoVentana.width > 420 && "horizontal" || "vertical"}
+                <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
                   formValue={datosFormulario.funcionProbabilidad}
                   formError={erroresFormulario.funcionProbabilidad}
                   model={generarEsquemaFuncionProbabilidad()}
@@ -294,48 +288,30 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
                   }}
                   ref={formularioDatosFuncionProbabilidad}
                 >
-                  <ResponsiveTable>
-                    <Thead>
-                      <Tr>
-                        <Th>#</Th>
-                        <Th>P</Th>
-                        <Th>X</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {/* TODO datosFormulario.m should be made into its own state var.*/}
-                      {Array(parametros.cantidadNumeros).fill(null).map((_, índice) => (
-                          <Tr key={índice}>
-                            <Td className="centrar">
-                              {índice + 1}
-                            </Td>
-                            <Td className="centrar">
-                              <Form.Group controlId={`p_${índice}`}>
-                                <Form.Control accepter={InputNumber}
-                                  errorPlacement="bottomEnd"
-                                  min={0} max={1}
-                                  name={`p_${índice}`} step={0.01}
-                                />
-                              </Form.Group>
-                            </Td>
-                            <Td className="centrar">
-                              <Form.Group controlId={`x_${índice}`}>
-                                <Form.Control accepter={InputNumber}
-                                  errorPlacement="bottomEnd"
-                                  name={`x_${índice}`}
-                                />
-                              </Form.Group>
-                            </Td>
-                          </Tr>
-                        )
-                      )}
-                      <Tr>
-                        <Td>&#x03A3;</Td>
-                        <Td>{ funcionProbabilidad.sumatoriaProbabilidades() }</Td>
-                        <Td></Td>
-                      </Tr>
-                    </Tbody>
-                  </ResponsiveTable>
+                  <ResponsiveTable 
+                    columns={[
+                      { title: "Probabilidad", }, 
+                      { title: "Valor x", },
+                    ]}
+                    rows={Array(parametros.cantidadNumeros).fill(null)
+                      .map((_, i) => [
+                        <Form.Group controlId={`p_${i}`}>
+                          <Form.Control accepter={InputNumber}
+                            errorPlacement="bottomEnd"
+                            min={0} max={1}
+                            name={`p_${i}`} step={0.01}
+                          />
+                        </Form.Group>,
+                        <Form.Group controlId={`x_${i}`}>
+                          <Form.Control accepter={InputNumber}
+                            errorPlacement="bottomEnd"
+                            name={`x_${i}`}
+                          />
+                        </Form.Group>,
+                      ])
+                      .concat([[ funcionProbabilidad.sumatoriaProbabilidades() ]])
+                    }
+                  />
                   {funcionProbabilidad.validacioesAdicionales().length > 0 && (
                     <Message type="error">
                       <h4>Errores de validación</h4>
@@ -419,22 +395,7 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
             }
             {pasoAsistente === 3 && resultados.length > 0 &&
               <div>
-                <ResponsiveTable>
-                  <Thead>
-                    <Tr>
-                      <Th>U(0, 1)</Th>
-                      <Th>X</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {resultados.map(resultado => (
-                      <tr>
-                        <Td>{ resultado.u }</Td>
-                        <Td>{ resultado.x }</Td>
-                      </tr>
-                    ))}
-                  </Tbody>
-                </ResponsiveTable>
+                <ResponsiveTable columns={randomNumbers.columns} rows={resultados} />
                 <ButtonGroup>
                   <BotonAtras onClick={() => setPasoAsistente(pasoAsistente -1)} />
                   <BotonSiguiente disabled />
