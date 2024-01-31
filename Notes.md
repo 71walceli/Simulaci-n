@@ -16,3 +16,4 @@
     - [ ] PDF
 - [ ] Algoritmo Congruencial Multiplicativo
     - [ ] Indicar valores no aconsejables que provoquen el colapso a 0 para los sigiuentes valores calculados.
+- [ ] Optimize rendering when dealing with large amounts of records
