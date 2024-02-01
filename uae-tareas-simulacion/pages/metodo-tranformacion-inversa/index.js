@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import React from "react"
 import Head from 'next/head'
 
-import "../../utils/"
+import "../../utils"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import { ResponsiveTable } from "../../Components/ResponsiveTable"
 import { randomNumbers } from "../../data/formats"

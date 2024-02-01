@@ -8,27 +8,27 @@ export default function Home() {
     {
       abreviatura: "A. C. M.",
       titulo: "Algoritmo Congruencial Multiplicativo",
-      url: "/20221106-1-algorirmo-congruencial-multiplicativo/",
+      url: "/algorirmo-congruencial-multiplicativo/",
     },
     {
       abreviatura: "M. T. I.",
       titulo: "Método de Transformación Inversa",
-      url: "/20221114-1-metodo-tranformacion-inversa/",
+      url: "/metodo-tranformacion-inversa/",
     },
     {
       abreviatura: "Dist. Binomial",
       titulo: "Simulador Distribución Binomial",
-      url: "/20221219-2-simulador-distribucion-binomial/",
+      url: "/simulador-distribucion-binomial/",
     },
     {
       abreviatura: "Dist. Poisson",
       titulo: "Simulador Distribución Poisson",
-      url: "/20230116-1-dostribucion-poison/",
+      url: "/dostribucion-poison/",
     },
     {
       abreviatura: "Dist. Geométrica",
       titulo: "Simulador Distribución Geométrica",
-      url: "/20221230-1-simulador-distribucion-geometroca/",
+      url: "/simulador-distribucion-geometroca/",
     },
   ]
 
