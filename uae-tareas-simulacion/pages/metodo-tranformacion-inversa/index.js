@@ -2,7 +2,6 @@ import {
   CustomProvider, Container, Header, Content, Form, InputNumber, ButtonGroup, Button, Divider, 
   Message, Steps
 } from "rsuite"
-import { Table as SuperResponsiveTable, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
 import { SchemaModel, NumberType } from "schema-typed"
 import { faArrowAltCircleLeft } from "@fortawesome/free-regular-svg-icons/faArrowAltCircleLeft"
 import { faArrowAltCircleRight } from "@fortawesome/free-regular-svg-icons/faArrowAltCircleRight"

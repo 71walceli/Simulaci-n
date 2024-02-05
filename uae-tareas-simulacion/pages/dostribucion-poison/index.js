@@ -1,8 +1,5 @@
 import { 
-  Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content, Divider, PanelGroup, Panel 
-} from "rsuite"
-import { Table as SuperResponsiveTable, Thead, Tbody, Tr, Th, Td } 
-  from 'react-super-responsive-table'
+  Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content} from "rsuite"
 import { NumberType, SchemaModel } from "schema-typed";
 import React from "react"
 import Head from 'next/head'

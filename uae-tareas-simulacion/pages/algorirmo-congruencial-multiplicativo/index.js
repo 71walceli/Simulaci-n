@@ -1,8 +1,7 @@
-import { Form, Input, MaskedInput, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Sidebar, Content } from "rsuite"
-import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
+import { Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content } from "rsuite";
 import { NumberType, SchemaModel } from "schema-typed";
-import React from "react"
-import Head from 'next/head'
+import React from "react";
+import Head from 'next/head';
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { randomNumbers } from "../../data/formats";
