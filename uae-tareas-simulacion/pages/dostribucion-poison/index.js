@@ -8,6 +8,8 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { Accordion } from "../../Components/Accordion";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
+import { SIMULADORES } from '../../I18n/es/simulators';
+import { BaseLayout } from "../../Components/BaseLayout";
 
 
 const _20230116_1_dostribucion_poison = (props) => {
@@ -90,70 +92,57 @@ const _20230116_1_dostribucion_poison = (props) => {
     };
   }, [formulario]);
 
+  const INDICE = 2;
   return (
-    <CustomProvider theme="dark">
-      <Head>
-        <title>Simulador Distribución Poisson</title>
-      </Head>
-      <Container>
-        <Header>
-          <h3>Simulador Distribución Poisson</h3>
-        </Header>
-        <Container style={{
-          maxHeight: "100%",
-        }}>
-          <Content style={{
-            textAlign: "center",
-          }}>
-            <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
-              formValue={datosFormulario} formError={erroresFormulario}
-              model={_esquemaFormulario}
-              onChange={setDatosFormulario} onCheck={setErroresFormulario}
-              onSubmit={calcular} ref={formulario}
-            >
-              <Form.Group controlId="promedio">
-                <Form.ControlLabel>Valor promedio L</Form.ControlLabel>
-                <Form.Control accepter={InputNumber} min={0} name="promedio"
-                />
-              </Form.Group>
-              <Form.Group controlId="noSimulaciones">
-                <Form.ControlLabel># Simulaciones</Form.ControlLabel>
-                <Form.Control accepter={InputNumber} min={1}
-                  name="noSimulaciones"
-                />
-              </Form.Group>
-              <ButtonGroup>
-                <Button type="submit" appearance="primary"
-                  disabled={Object.entries(erroresFormulario).length > 0}
-                >
-                  Calcular
-                </Button>
-              </ButtonGroup>
-            </Form>
-            {/* TODO Hcer componente de tablas estándar */}
-            {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-              <Accordion header="Distribución de probabilidad" defaultExpanded>
-                <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
-                  rows={parametrosAlgoritmo.funcionProbabilidad}
-                />
-              </Accordion>
-            )}
-            {resultados?.resultados?.length > 0 && (
-              <Accordion header="Resultados de simulación" style={{ marginTop: "2em" }}>
-                <ResponsiveTable columns={randomNumbers.columns}
-                  rows={resultados.resultados}
-                />
-              </Accordion>
-            )}
-            {resultados?.conteos?.length > 0 && (
-              <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
-                <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
-              </Accordion>
-            )}
-          </Content>
-        </Container>
-      </Container>
-    </CustomProvider>
+    <BaseLayout title={SIMULADORES[INDICE].title} style={{
+      textAlign: "center",
+    }}>
+      <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
+        formValue={datosFormulario} formError={erroresFormulario}
+        model={_esquemaFormulario}
+        onChange={setDatosFormulario} onCheck={setErroresFormulario}
+        onSubmit={calcular} ref={formulario}
+      >
+        <Form.Group controlId="promedio">
+          <Form.ControlLabel>Valor promedio L</Form.ControlLabel>
+          <Form.Control accepter={InputNumber} min={0} name="promedio"
+          />
+        </Form.Group>
+        <Form.Group controlId="noSimulaciones">
+          <Form.ControlLabel># Simulaciones</Form.ControlLabel>
+          <Form.Control accepter={InputNumber} min={1}
+            name="noSimulaciones"
+          />
+        </Form.Group>
+        <ButtonGroup>
+          <Button type="submit" appearance="primary"
+            disabled={Object.entries(erroresFormulario).length > 0}
+          >
+            Calcular
+          </Button>
+        </ButtonGroup>
+      </Form>
+      {/* TODO Hcer componente de tablas estándar */}
+      {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
+        <Accordion header="Distribución de probabilidad" defaultExpanded>
+          <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
+            rows={parametrosAlgoritmo.funcionProbabilidad}
+          />
+        </Accordion>
+      )}
+      {resultados?.resultados?.length > 0 && (
+        <Accordion header="Resultados de simulación" style={{ marginTop: "2em" }}>
+          <ResponsiveTable columns={randomNumbers.columns}
+            rows={resultados.resultados}
+          />
+        </Accordion>
+      )}
+      {resultados?.conteos?.length > 0 && (
+        <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
+          <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
+        </Accordion>
+      )}
+    </BaseLayout>
   );
 };
 export default _20230116_1_dostribucion_poison

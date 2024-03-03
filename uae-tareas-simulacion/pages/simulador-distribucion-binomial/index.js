@@ -7,6 +7,8 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 import { Accordion } from "../../Components/Accordion";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
+import { BaseLayout } from "../../Components/BaseLayout";
+import { SIMULADORES } from '../../I18n/es/simulators';
 
 
 const _20221219_2_simulador_distribucion_binomial = (props) => {
@@ -100,76 +102,61 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
     };
   }, [formulario]);
 
+  const INDICE = 3;
   return (
-    <CustomProvider theme="dark">
-      <Head>
-        <title>Simulador Distribución Binomial</title>
-      </Head>
-      <Container>
-        <Header>
-          <h3>Simulador Distribución Binomial</h3>
-        </Header>
-        <Container style={{
-          maxHeight: "100%",
-        }}>
-          <Content style={{
-            textAlign: "center",
-          }}>
-            <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
-              formValue={datosFormulario} formError={erroresFormulario}
-              model={_esquemaFormulario}
-              onChange={setDatosFormulario} onCheck={setErroresFormulario}
-              onSubmit={calcular} ref={formulario}
-            >
-              <Form.Group controlId="probabilidad">
-                <Form.ControlLabel>Probabilidad de éxito</Form.ControlLabel>
-                <Form.Control accepter={InputNumber} defaultValue={0}
-                  min={0} max={1} step={0.01} name="probabilidad"
-                />
-              </Form.Group>
-              <Form.Group controlId="noSimulaciones">
-                <Form.ControlLabel># Simulaciones</Form.ControlLabel>
-                <Form.Control accepter={InputNumber} defaultValue={10} min={1}
-                  name="noSimulaciones"
-                />
-              </Form.Group>
-              <Form.Group controlId="noElementos">
-                <Form.ControlLabel># Elementos</Form.ControlLabel>
-                <Form.Control accepter={InputNumber} defaultValue={3} min={1}
-                  name="noElementos"
-                />
-              </Form.Group>
-              <ButtonGroup>
-                <Button type="submit" appearance="primary"
-                  disabled={Object.entries(erroresFormulario).length > 0}
-                >
-                  Calcular
-                </Button>
-              </ButtonGroup>
-            </Form>
-            {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-              <Accordion header="Distribución de probabilidad" defaultExpanded>
-                <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
-                  rows={parametrosAlgoritmo.funcionProbabilidad}
-                />
-              </Accordion>
-            )}
-            {resultados?.resultados?.length > 0 && (
-              <Accordion header="Resultados de simulación" style={{ marginTop: "2em" }}>
-                <ResponsiveTable columns={randomNumbers.columns}
-                  rows={resultados.resultados}
-                />
-              </Accordion>
-            )}
-            {resultados?.conteos?.length > 0 && (
-              <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
-                <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
-              </Accordion>
-            )}
-          </Content>
-        </Container>
-      </Container>
-    </CustomProvider>
+    <BaseLayout title={SIMULADORES[INDICE].title}>
+      <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
+        formValue={datosFormulario} formError={erroresFormulario}
+        model={_esquemaFormulario}
+        onChange={setDatosFormulario} onCheck={setErroresFormulario}
+        onSubmit={calcular} ref={formulario}
+      >
+        <Form.Group controlId="probabilidad">
+          <Form.ControlLabel>Probabilidad de éxito</Form.ControlLabel>
+          <Form.Control accepter={InputNumber} defaultValue={0}
+            min={0} max={1} step={0.01} name="probabilidad"
+          />
+        </Form.Group>
+        <Form.Group controlId="noSimulaciones">
+          <Form.ControlLabel># Simulaciones</Form.ControlLabel>
+          <Form.Control accepter={InputNumber} defaultValue={10} min={1}
+            name="noSimulaciones"
+          />
+        </Form.Group>
+        <Form.Group controlId="noElementos">
+          <Form.ControlLabel># Elementos</Form.ControlLabel>
+          <Form.Control accepter={InputNumber} defaultValue={3} min={1}
+            name="noElementos"
+          />
+        </Form.Group>
+        <ButtonGroup>
+          <Button type="submit" appearance="primary"
+            disabled={Object.entries(erroresFormulario).length > 0}
+          >
+            Calcular
+          </Button>
+        </ButtonGroup>
+      </Form>
+      {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
+        <Accordion header="Distribución de probabilidad" defaultExpanded>
+          <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
+            rows={parametrosAlgoritmo.funcionProbabilidad}
+          />
+        </Accordion>
+      )}
+      {resultados?.resultados?.length > 0 && (
+        <Accordion header="Resultados de simulación" style={{ marginTop: "2em" }}>
+          <ResponsiveTable columns={randomNumbers.columns}
+            rows={resultados.resultados}
+          />
+        </Accordion>
+      )}
+      {resultados?.conteos?.length > 0 && (
+        <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
+          <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
+        </Accordion>
+      )}
+    </BaseLayout>
   );
 };
 export default _20221219_2_simulador_distribucion_binomial

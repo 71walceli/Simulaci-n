@@ -1,36 +1,10 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { SIMULADORES } from '../I18n/es/simulators'
 
 
 export default function Home() {
-  const SIMULADORES = [
-    {
-      abreviatura: "A. C. M.",
-      titulo: "Algoritmo Congruencial Multiplicativo",
-      url: "/algorirmo-congruencial-multiplicativo/",
-    },
-    {
-      abreviatura: "M. T. I.",
-      titulo: "Método de Transformación Inversa",
-      url: "/metodo-tranformacion-inversa/",
-    },
-    {
-      abreviatura: "Dist. Binomial",
-      titulo: "Simulador Distribución Binomial",
-      url: "/simulador-distribucion-binomial/",
-    },
-    {
-      abreviatura: "Dist. Poisson",
-      titulo: "Simulador Distribución Poisson",
-      url: "/dostribucion-poison/",
-    },
-    {
-      abreviatura: "Dist. Geométrica",
-      titulo: "Simulador Distribución Geométrica",
-      url: "/simulador-distribucion-geometroca/",
-    },
-  ]
 
   return (
     <div className={styles.container}>
@@ -46,9 +20,9 @@ export default function Home() {
         </h1>
         <div className={styles.grid}>
           {SIMULADORES.map(link => (
-            <a kay={link.url} href={link.url} className={styles.card}>
-              <h2>{link.abreviatura} &rarr;</h2>
-              <p>{link.titulo}</p>
+            <a key={link.url} href={link.url} className={styles.card}>
+              <h2>{link.abbreviation} &rarr;</h2>
+              <p>{link.title}</p>
             </a>
           ))}
         </div>

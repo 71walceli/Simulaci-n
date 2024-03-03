@@ -1,5 +1,5 @@
 import { 
-  CustomProvider, Container, Header, Content, Form, InputNumber, ButtonGroup, Button, Divider, 
+  Container, Header, Content, Form, InputNumber, ButtonGroup, Button, Divider, 
   Message, Steps
 } from "rsuite"
 import { SchemaModel, NumberType } from "schema-typed"
@@ -13,11 +13,12 @@ import "../../utils"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import { ResponsiveTable } from "../../Components/ResponsiveTable"
 import { randomNumbers } from "../../data/formats"
+import { BaseLayout } from "../../Components/BaseLayout"
+import { SIMULADORES } from '../../I18n/es/simulators'
 
 
 const _20221114_1_metodo_tranformacion_inversa = (props) => {
   //#region configuracion
-  const titulo = "Método de Transformación Inversa"
   const _formularioLimpio = {
     cantidadNumeros: {
       n: 0
@@ -161,250 +162,234 @@ const _20221114_1_metodo_tranformacion_inversa = (props) => {
   //#endregion
 
   return (
-    <CustomProvider theme="dark">
-      <Head>
-        <title>{titulo}</title>
-      </Head>
-      <Container>
-        <Header>
-          <h3>{titulo}</h3>
-        </Header>
-        <Container style={{
-          maxHeight: "100%",
-        }}>
-          <Content style={{
-            textAlign: "center",
-          }}>
-            <Steps current={pasoAsistente} className="padding-iem-south"
-              vertical={windowSize.width < 600}
-            >
-              {/* TODO Add click handler */}
-              <Steps.Item title="Cantidad de datos" />
-              <Steps.Item title="Función de probabilidad" />
-              <Steps.Item title="Parámetros de simulación" />
-              <Steps.Item title="Resultados" />
-            </Steps>
-            {/* TODO Add buttons at botton, don't repeat them */}
-            {pasoAsistente === 0 && 
-              <div>
-                <Form
-                  formValue={datosFormulario.cantidadNumeros}
-                  formError={erroresFormulario.cantidadNumeros}
-                  model={_esquemaFormulario.cantidadNumeros}
-                  onChange={valor => {
-                    setDatosFormulario({
-                      ...datosFormulario,
-                      cantidadNumeros: valor,
-                    })
-                  }}
-                  onCheck={valor => {
-                    setErroresFormulario({
-                      ...erroresFormulario,
-                      cantidadNumeros: valor,
-                    })
-                  }}
-                  onSubmit={() => {
-                    const camposDeMas =
-                      parametros.cantidadNumeros - datosFormulario.cantidadNumeros.n
-                    // TODO Mejor usar modal de rsuite
-                    if (parametros.cantidadNumeros !== 0 && camposDeMas > 0
-                      && !confirm("AL asignar un número de campos menor, los "
-                        + "valores eliminados no podrán ser recuperados. "
-                        + "¿Desea continuar?"
-                      )
-                    ) {
-                      return
-                    }
-                    const nuevaCantidad = Number(datosFormulario.cantidadNumeros.n);
-                    setParametros({
-                      funcionProbabilidad: [],
-                      cantidadNumeros: nuevaCantidad,
-                      cantidasSimulaciones: parametros.cantidadSimulaciones,
-                    })
-                    if (camposDeMas > 0) {
-                      const nuevosDatos = {
-                        ...datosFormulario.funcionProbabilidad
-                      }
-                      const camposParaBorrar = Object.keys(nuevosDatos)
-                        .filter(campo =>
-                          Number(campo.split("_")[1]) > nuevaCantidad - 1
-                        )
-                      camposParaBorrar.map(campo => delete nuevosDatos[campo])
-                      setDatosFormulario({
-                        ...datosFormulario,
-                        funcionProbabilidad: nuevosDatos
-                      })
-                      // TODO Splice parametros.funcionProbabilidad
-                    }
-                    setPasoAsistente(1)
-                  }}
-                  ref={formularioCantidadNumeros}
-                >
-                  <Form.Group controlId="n">
-                    <Form.ControlLabel>Cantidad de valores</Form.ControlLabel>
-                    <Form.Control accepter={InputNumber} min={1} name="n" />
-                  </Form.Group>
-                  <ButtonGroup>
-                    {/* TODO Poner en su propio componente */}
-                    <Button type="button" appearance="ghost" color="red">
-                      Borrar todo
-                    </Button>
-                    <BotonSiguiente type="submit"
-                      disabled={
-                        Object.entries(erroresFormulario.cantidadNumeros || {}).length > 0
-                      }
+    <BaseLayout title={SIMULADORES[1].title}>
+      <Steps current={pasoAsistente} className="padding-iem-south"
+        vertical={windowSize.width < 600}
+      >
+        {/* TODO Add click handler */}
+        <Steps.Item title="Cantidad de datos" />
+        <Steps.Item title="Función de probabilidad" />
+        <Steps.Item title="Parámetros de simulación" />
+        <Steps.Item title="Resultados" />
+      </Steps>
+      {/* TODO Add buttons at botton, don't repeat them */}
+      {pasoAsistente === 0 && 
+        <div>
+          <Form
+            formValue={datosFormulario.cantidadNumeros}
+            formError={erroresFormulario.cantidadNumeros}
+            model={_esquemaFormulario.cantidadNumeros}
+            onChange={valor => {
+              setDatosFormulario({
+                ...datosFormulario,
+                cantidadNumeros: valor,
+              })
+            }}
+            onCheck={valor => {
+              setErroresFormulario({
+                ...erroresFormulario,
+                cantidadNumeros: valor,
+              })
+            }}
+            onSubmit={() => {
+              const camposDeMas =
+                parametros.cantidadNumeros - datosFormulario.cantidadNumeros.n
+              // TODO Mejor usar modal de rsuite
+              if (parametros.cantidadNumeros !== 0 && camposDeMas > 0
+                && !confirm("AL asignar un número de campos menor, los "
+                  + "valores eliminados no podrán ser recuperados. "
+                  + "¿Desea continuar?"
+                )
+              ) {
+                return
+              }
+              const nuevaCantidad = Number(datosFormulario.cantidadNumeros.n);
+              setParametros({
+                funcionProbabilidad: [],
+                cantidadNumeros: nuevaCantidad,
+                cantidasSimulaciones: parametros.cantidadSimulaciones,
+              })
+              if (camposDeMas > 0) {
+                const nuevosDatos = {
+                  ...datosFormulario.funcionProbabilidad
+                }
+                const camposParaBorrar = Object.keys(nuevosDatos)
+                  .filter(campo =>
+                    Number(campo.split("_")[1]) > nuevaCantidad - 1
+                  )
+                camposParaBorrar.map(campo => delete nuevosDatos[campo])
+                setDatosFormulario({
+                  ...datosFormulario,
+                  funcionProbabilidad: nuevosDatos
+                })
+                // TODO Splice parametros.funcionProbabilidad
+              }
+              setPasoAsistente(1)
+            }}
+            ref={formularioCantidadNumeros}
+          >
+            <Form.Group controlId="n">
+              <Form.ControlLabel>Cantidad de valores</Form.ControlLabel>
+              <Form.Control accepter={InputNumber} min={1} name="n" />
+            </Form.Group>
+            <ButtonGroup>
+              {/* TODO Poner en su propio componente */}
+              <Button type="button" appearance="ghost" color="red">
+                Borrar todo
+              </Button>
+              <BotonSiguiente type="submit"
+                disabled={
+                  Object.entries(erroresFormulario.cantidadNumeros || {}).length > 0
+                }
+              />
+            </ButtonGroup>
+          </Form>
+        </div>
+      }
+      {pasoAsistente === 1 && parametros.cantidadNumeros > 0 &&
+        <div>
+          <Divider />
+          <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
+            formValue={datosFormulario.funcionProbabilidad}
+            formError={erroresFormulario.funcionProbabilidad}
+            model={generarEsquemaFuncionProbabilidad()}
+            onChange={valor => {
+              setDatosFormulario({
+                ...datosFormulario,
+                funcionProbabilidad: valor,
+              })
+            }}
+            onCheck={valor => {
+              setErroresFormulario({
+                ...erroresFormulario,
+                funcionProbabilidad: valor,
+              })
+            }}
+            onSubmit={() => {
+              setParametros({
+                // TODO Considerar el resto de parámetros.
+                cantidadNumeros: parametros.cantidadNumeros,
+                funcionProbabilidad: funcionProbabilidad.generarParametros()
+              })
+              setPasoAsistente(2)
+            }}
+            ref={formularioDatosFuncionProbabilidad}
+          >
+            <ResponsiveTable 
+              columns={[
+                { title: "Probabilidad", }, 
+                { title: "Valor x", },
+              ]}
+              rows={Array(parametros.cantidadNumeros).fill(null)
+                .map((_, i) => [
+                  <Form.Group key={`p_${i}`} controlId={`p_${i}`}>
+                    <Form.Control accepter={InputNumber}
+                      errorPlacement="bottomEnd"
+                      min={0} max={1}
+                      name={`p_${i}`} step={0.01}
                     />
-                  </ButtonGroup>
-                </Form>
-              </div>
-            }
-            {pasoAsistente === 1 && parametros.cantidadNumeros > 0 &&
-              <div>
-                <Divider />
-                <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
-                  formValue={datosFormulario.funcionProbabilidad}
-                  formError={erroresFormulario.funcionProbabilidad}
-                  model={generarEsquemaFuncionProbabilidad()}
-                  onChange={valor => {
-                    setDatosFormulario({
-                      ...datosFormulario,
-                      funcionProbabilidad: valor,
-                    })
-                  }}
-                  onCheck={valor => {
-                    setErroresFormulario({
-                      ...erroresFormulario,
-                      funcionProbabilidad: valor,
-                    })
-                  }}
-                  onSubmit={() => {
-                    setParametros({
-                      // TODO Considerar el resto de parámetros.
-                      cantidadNumeros: parametros.cantidadNumeros,
-                      funcionProbabilidad: funcionProbabilidad.generarParametros()
-                    })
-                    setPasoAsistente(2)
-                  }}
-                  ref={formularioDatosFuncionProbabilidad}
-                >
-                  <ResponsiveTable 
-                    columns={[
-                      { title: "Probabilidad", }, 
-                      { title: "Valor x", },
-                    ]}
-                    rows={Array(parametros.cantidadNumeros).fill(null)
-                      .map((_, i) => [
-                        <Form.Group controlId={`p_${i}`}>
-                          <Form.Control accepter={InputNumber}
-                            errorPlacement="bottomEnd"
-                            min={0} max={1}
-                            name={`p_${i}`} step={0.01}
-                          />
-                        </Form.Group>,
-                        <Form.Group controlId={`x_${i}`}>
-                          <Form.Control accepter={InputNumber}
-                            errorPlacement="bottomEnd"
-                            name={`x_${i}`}
-                          />
-                        </Form.Group>,
-                      ])
-                      .concat([[ funcionProbabilidad.sumatoriaProbabilidades() ]])
-                    }
-                  />
-                  {funcionProbabilidad.validacioesAdicionales().length > 0 && (
-                    <Message type="error">
-                      <h4>Errores de validación</h4>
-                      <ul>{
-                        funcionProbabilidad.validacioesAdicionales().map((error) => (
-                          <li key={error.hashCode()} className="derecha">{ error }</li>
-                        ))
-                      }</ul>
-                    </Message>
-                  )}
-                  <ButtonGroup>
-                    <BotonAtras type="button" onClick={() => setPasoAsistente(pasoAsistente -1)} />
-                    <BotonSiguiente type="submit" appearance="primary"
-                      disabled={
-                        funcionProbabilidad.validacioesAdicionales().length > 0
-                      }
+                  </Form.Group>,
+                  <Form.Group key={`x_${i}`} controlId={`x_${i}`}>
+                    <Form.Control accepter={InputNumber}
+                      errorPlacement="bottomEnd"
+                      name={`x_${i}`}
                     />
-                  </ButtonGroup>
-                </Form>
-              </div>
-            }
-            {pasoAsistente === 2 && parametros.funcionProbabilidad.length > 0 && 
-              <div>
-                <Divider />
-                <Form
-                  formValue={datosFormulario.cantidadSimulaciones}
-                  formError={erroresFormulario.cantidadSimulaciones}
-                  model={_esquemaFormulario.cantidasSimulaciones}
-                  onChange={valor => {
-                    setDatosFormulario({
-                      ...datosFormulario,
-                      cantidadSimulaciones: valor,
-                    })
-                  }}
-                  onCheck={valor => {
-                    setErroresFormulario({
-                      ...erroresFormulario,
-                      cantidadSimulaciones: valor,
-                    })
-                  }}
-                  onSubmit={() => {
-                    const obtenerPorMetodoTransformacionInversa = u => {
-                      let probabilidadAcumulada = 0
-                      for (let i=0; i<parametros.funcionProbabilidad.length; i++) {
-                        probabilidadAcumulada += parametros.funcionProbabilidad[i].p
-                        if (u < probabilidadAcumulada) {
-                          return parametros.funcionProbabilidad[i].x
-                        }
-                      }
-                    }
+                  </Form.Group>,
+                ])
+                .concat([[ funcionProbabilidad.sumatoriaProbabilidades() ]])
+              }
+            />
+            {funcionProbabilidad.validacioesAdicionales().length > 0 && (
+              <Message type="error">
+                <h4>Errores de validación</h4>
+                <ul>{
+                  funcionProbabilidad.validacioesAdicionales().map((error) => (
+                    <li key={error.hashCode()} className="derecha">{ error }</li>
+                  ))
+                }</ul>
+              </Message>
+            )}
+            <ButtonGroup>
+              <BotonAtras type="button" onClick={() => setPasoAsistente(pasoAsistente -1)} />
+              <BotonSiguiente type="submit" appearance="primary"
+                disabled={
+                  funcionProbabilidad.validacioesAdicionales().length > 0
+                }
+              />
+            </ButtonGroup>
+          </Form>
+        </div>
+      }
+      {pasoAsistente === 2 && parametros.funcionProbabilidad.length > 0 && 
+        <div>
+          <Divider />
+          <Form
+            formValue={datosFormulario.cantidadSimulaciones}
+            formError={erroresFormulario.cantidadSimulaciones}
+            model={_esquemaFormulario.cantidasSimulaciones}
+            onChange={valor => {
+              setDatosFormulario({
+                ...datosFormulario,
+                cantidadSimulaciones: valor,
+              })
+            }}
+            onCheck={valor => {
+              setErroresFormulario({
+                ...erroresFormulario,
+                cantidadSimulaciones: valor,
+              })
+            }}
+            onSubmit={() => {
+              const obtenerPorMetodoTransformacionInversa = u => {
+                let probabilidadAcumulada = 0
+                for (let i=0; i<parametros.funcionProbabilidad.length; i++) {
+                  probabilidadAcumulada += parametros.funcionProbabilidad[i].p
+                  if (u < probabilidadAcumulada) {
+                    return parametros.funcionProbabilidad[i].x
+                  }
+                }
+              }
 
-                    const cantidadSimulaciones = Number(datosFormulario.cantidadSimulaciones.n);
-                    setParametros({
-                      ...parametros,
-                      cantidadSimulaciones: cantidadSimulaciones
-                    })
-                    const nuevosResultados = Array(cantidadSimulaciones).fill(0).map(_ => {
-                      const u = Math.random();
-                      return { u: u, x: obtenerPorMetodoTransformacionInversa(u), }
-                    })
-                    console.log(nuevosResultados)
-                    setResultados(nuevosResultados)
-                    setPasoAsistente(3)
-                  }}
-                  ref={formularioParametrosSimulacion}
-                >
-                  <Form.Group controlId="n">
-                    <Form.ControlLabel>Número de simulaciones</Form.ControlLabel>
-                    <Form.Control accepter={InputNumber} min={1} name="n" />
-                  </Form.Group>
-                  <ButtonGroup>
-                    <BotonAtras type="button" onClick={() => setPasoAsistente(pasoAsistente -1)} />
-                    <BotonSiguiente type="submit"
-                      disabled={
-                        Object.entries(erroresFormulario.cantidadSimulaciones || {}).length > 0
-                      }
-                    />
-                  </ButtonGroup>
-                </Form>
-              </div>
-            }
-            {pasoAsistente === 3 && resultados.length > 0 &&
-              <div>
-                <ResponsiveTable columns={randomNumbers.columns} rows={resultados} />
-                <ButtonGroup>
-                  <BotonAtras onClick={() => setPasoAsistente(pasoAsistente -1)} />
-                  <BotonSiguiente disabled />
-                </ButtonGroup>
-              </div>
-            }
-          </Content>
-        </Container>
-      </Container>
-    </CustomProvider>
+              const cantidadSimulaciones = Number(datosFormulario.cantidadSimulaciones.n);
+              setParametros({
+                ...parametros,
+                cantidadSimulaciones: cantidadSimulaciones
+              })
+              const nuevosResultados = Array(cantidadSimulaciones).fill(0).map(_ => {
+                const u = Math.random();
+                return { u: u, x: obtenerPorMetodoTransformacionInversa(u), }
+              })
+              console.log(nuevosResultados)
+              setResultados(nuevosResultados)
+              setPasoAsistente(3)
+            }}
+            ref={formularioParametrosSimulacion}
+          >
+            <Form.Group controlId="n">
+              <Form.ControlLabel>Número de simulaciones</Form.ControlLabel>
+              <Form.Control accepter={InputNumber} min={1} name="n" />
+            </Form.Group>
+            <ButtonGroup>
+              <BotonAtras type="button" onClick={() => setPasoAsistente(pasoAsistente -1)} />
+              <BotonSiguiente type="submit"
+                disabled={
+                  Object.entries(erroresFormulario.cantidadSimulaciones || {}).length > 0
+                }
+              />
+            </ButtonGroup>
+          </Form>
+        </div>
+      }
+      {pasoAsistente === 3 && resultados.length > 0 &&
+        <div>
+          <ResponsiveTable columns={randomNumbers.columns} rows={resultados} />
+          <ButtonGroup>
+            <BotonAtras onClick={() => setPasoAsistente(pasoAsistente -1)} />
+            <BotonSiguiente disabled />
+          </ButtonGroup>
+        </div>
+      }
+    </BaseLayout>
   );
 };
 export default _20221114_1_metodo_tranformacion_inversa

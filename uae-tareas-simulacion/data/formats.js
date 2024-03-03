@@ -1,3 +1,4 @@
+import Latex from "react-latex-next"
 
 export const probabilityDistribution = {
   columns: [
@@ -19,11 +20,11 @@ export const probabilityDistribution = {
 export const randomNumbers = {
   columns: [
     {
-      title: "U(0, 1)",
+      title: <Latex>{String.raw`$U (0, 1)$`}</Latex>,
       key: "u",
     },
     {
-      title: "X",
+      title: <Latex>{String.raw`$X$`}</Latex>,
       key: "x",
     },
   ]
