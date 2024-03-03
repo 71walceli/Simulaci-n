@@ -3,7 +3,7 @@ version: '3.1'
 services:
   tareas-dev:
     entrypoint: yarn run dev
-    hostname: uae_simulacion-tareas-dev
+    hostname: dev.simulacion.s7sa.uae.internal
     image: node:20
     user: "1000:1000"
     volumes:
@@ -12,14 +12,8 @@ services:
   tareas-produccion:
     build: ./uae-tareas-simulacion
     entrypoint: yarn run start
-    hostname: uae_simulacion-tareas-produccion
+    hostname: produccion.simulacion.s7sa.uae.internal
     image: uae_simulacion/tareas-produccion:0.1
-    networks:
-      - https-proxy
     user: "1000:1000"
     restart: unless-stopped
     working_dir: /App
-networks:
-  https-proxy: 
-    external: true
-
