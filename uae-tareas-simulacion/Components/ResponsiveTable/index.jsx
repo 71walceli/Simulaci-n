@@ -21,9 +21,9 @@ export const ResponsiveTable = ({ columns, rows, keyField, ...props }) => {
           margin: "0 auto"
         }}
       >
-        <Thead className={styles.stickyHeaders}>
-          <Tr>
-            {columns.map(h => <Th key={h.key}>{h.title}</Th>)}
+        <Thead>
+          <Tr className="text-center">
+            {columns.map((h, i) => <Th key={h.key || i}>{h.title}</Th>)}
           </Tr>
         </Thead>
         <Tbody>
