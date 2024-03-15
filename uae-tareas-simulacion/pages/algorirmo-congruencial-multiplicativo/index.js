@@ -1,16 +1,16 @@
-import { Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content } from "rsuite";
+import { Form, Button, ButtonGroup, InputNumber } from "rsuite";
 import { NumberType, SchemaModel } from "schema-typed";
-import React from "react";
-import Head from 'next/head';
+import React, { useEffect } from "react";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
-import { SIMULADORES } from '../../I18n/es/simulators';
 import Latex from "react-latex-next";
+import { useRouter } from "next/router";
+import { Description, META } from "../../I18n/es/simulators/MultiplicativeCongruentialAlgorithm";
 
 
-const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
+const MCA = () => {
   const _formularioLimpio = {
     a: "0",
     m: "0",
@@ -39,11 +39,11 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
   const [valores_x, setValores_x] = React.useState();
   const windowSize = useWindowSize();
 
-  const calcular = () => {
-    const var_a = Number(datosFormulario.a);
-    const var_m = Number(datosFormulario.m);
-    const var_x0 = Number(datosFormulario.x0);
-    const var_n = Number(datosFormulario.n);
+  const calcular = (parametros) => {
+    const var_a = Number(parametros.a);
+    const var_m = Number(parametros.m);
+    const var_x0 = Number(parametros.x0);
+    const var_n = Number(parametros.n);
 
     //const _valores_u = [{ i: 0, x: x0, u: x0/m, }]
     const _valores_x = [var_x0];
@@ -54,7 +54,7 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
       _valores_x.push(x_actual);
     }
     setValores_x(_valores_x);
-    setParametrosAlgoritmo(datosFormulario)
+    setParametrosAlgoritmo(parametros)
   };
 
   React.useEffect(() => {
@@ -66,14 +66,26 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
     };
   }, [formulario]);
 
-  const INDICE = 0;
+  const { query } = useRouter()
+  useEffect(() => {
+    if (Object.keys(query).length === 0)
+      return;
+    const validationResult = _esquemaFormulario.check(query)
+    if (Object.values(validationResult).filter(x => x.hasError).length === 0) {
+      console.log({query, validationResult})
+      calcular(query)
+      setDatosFormulario(() => query)
+      setErroresFormulario({})
+    }
+  }, [query])
+
   return (
-    <BaseLayout title={SIMULADORES[INDICE].title} rightContent={SIMULADORES[INDICE].description}>
+    <BaseLayout title={META.title} rightContent={<Description />}>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
         onChange={setDatosFormulario} onCheck={setErroresFormulario}
-        onSubmit={calcular} ref={formulario}
+        onSubmit={() => calcular(datosFormulario)} ref={formulario}
       >
         <Form.Group controlId="a">
           <Form.ControlLabel>Multiplicador <Latex>{String.raw`$\alpha$`}</Latex></Form.ControlLabel>
@@ -107,4 +119,4 @@ const _20221106_1_algorirmo_congruencial_multiplicativo = (props) => {
     </BaseLayout>
   );
 };
-export default _20221106_1_algorirmo_congruencial_multiplicativo
+export default MCA
