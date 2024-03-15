@@ -1,20 +1,19 @@
 import { 
-  Container, Header, Content, Form, InputNumber, ButtonGroup, Button, Divider, 
-  Message, Steps
-} from "rsuite"
-import { SchemaModel, NumberType } from "schema-typed"
-import { faArrowAltCircleLeft } from "@fortawesome/free-regular-svg-icons/faArrowAltCircleLeft"
-import { faArrowAltCircleRight } from "@fortawesome/free-regular-svg-icons/faArrowAltCircleRight"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import React from "react"
-import Head from 'next/head'
+  Form, InputNumber, ButtonGroup, Button, 
+  Message} from "rsuite"
+import { SchemaModel, NumberType, StringType } from "schema-typed"
+import React, { useEffect, useRef } from "react"
+import Latex from "react-latex-next"
+import { useRouter } from "next/router"
 
-import "../../utils"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import { ResponsiveTable } from "../../Components/ResponsiveTable"
 import { randomNumbers } from "../../data/formats"
 import { BaseLayout } from "../../Components/BaseLayout"
-import { SIMULADORES } from '../../I18n/es/simulators'
+import { Description, META } from "../../I18n/es/simulators/InverseTransformationMethod"
+import { useSchemaModelValidator } from "../../data/useSchemaModelValidator"
+
+import "../../utils"
 
 
 const InverseTransformationMethod = (props) => {
