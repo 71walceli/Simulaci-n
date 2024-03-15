@@ -2,8 +2,7 @@
 # Pending
 - [x] Replace tables with acordion weapped one
 - [ ] Add plots at least for counts
-- [ ] Use a base layout component
-    - [ ] Add to it context providers as well
+- [x] Use a base layout component
     - [ ] On PC screen, full screen, sibebars should display by default.
 - [ ] Add help and descriptions
     - [ ] Formulas
