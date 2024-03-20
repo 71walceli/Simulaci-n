@@ -1,6 +1,4 @@
-import { 
-  Form, InputNumber, ButtonGroup, Button, 
-  Message} from "rsuite"
+import { Form, InputNumber, ButtonGroup, Button, Message } from "rsuite"
 import { SchemaModel, NumberType, StringType } from "schema-typed"
 import React, { useEffect, useRef } from "react"
 import Latex from "react-latex-next"
@@ -11,7 +9,7 @@ import { ResponsiveTable } from "../../Components/ResponsiveTable"
 import { randomNumbers } from "../../data/formats"
 import { BaseLayout } from "../../Components/BaseLayout"
 import { Description, META } from "../../I18n/es/simulators/InverseTransformationMethod"
-import { useSchemaModelValidator } from "../../data/useSchemaModelValidator"
+import { useSchemaModelValidator } from "../../controllers/useSchemaModelValidator"
 
 import "../../utils"
 
@@ -24,46 +22,35 @@ const InverseTransformationMethod = (props) => {
     cantidadSimulaciones: 0,
   };
   
-  const formularios = {
-    funcionProbabilidad: useRef(),
-    cantidadSimulaciones: useRef(),
-  }
-  useEffect(() => {
-    formularios.funcionProbabilidad.current?.check();
-    formularios.cantidadSimulaciones.current?.check();
-    return () => {
-      formularios.funcionProbabilidad.current = null;
-      formularios.cantidadSimulaciones.current = null;
-    };
-  }, [formularios]);
   const [datosFormulario, setDatosFormulario] = React.useState(_formularioLimpio);
   const [parametros, setParametros] = React.useState({
-    cantidadNumeros: 0,
     funcionProbabilidad: [],
     cantidadSimulaciones: 0,
   })
   const [resultados, setResultados] = React.useState([])
-  const [erroresFormulario, setErroresFormulario] = React.useState({
-    funcionProbabilidad: {},
-    cantidadSimulaciones: "Requerido",
-  });
-  const windowSize = useWindowSize();
-
-  const generarEsquemaFuncionProbabilidad = React.useCallback(
+  const validadorFuncionProbabilidad = React.useMemo(
     () => {
       const schema = {}
-      for (let i = 0; i < parametros.cantidadNumeros; i++) {
+      for (let i = 0; i < datosFormulario.cantidadNumeros; i++) {
         schema[`p_${i}`] = NumberType("Requerido").range(0, 1, "Debe estar entre 0 y 1")
           .isRequired("Requerido")
         schema[`x_${i}`] = NumberType("Requerido").isRequired("Requerido")
       }
       return SchemaModel(schema)
-    }
-    , [parametros.cantidadNumeros]
+    }, 
+    [datosFormulario.cantidadNumeros]
   )
-
+  const [erroresFormulario, setErroresFormulario] = React.useState({
+    funcionProbabilidad: {},
+    cantidadSimulaciones: "Requerido",
+  });
+  const windowSize = useWindowSize();
+  useEffect(() => console.log({ datosFormulario }), [datosFormulario])
+  useEffect(() => console.log({ erroresFormulario }), [erroresFormulario])
+  
   const funcionProbabilidad = {}
-  funcionProbabilidad.generarParametros = React.useCallback(() => {
+  funcionProbabilidad.generarParametros = React.useCallback(
+    () => {
       // TODO Optimizar
       const nuevosDatos = []
       for (let i=0; i<parametros.cantidadNumeros; i++) {
@@ -76,26 +63,26 @@ const InverseTransformationMethod = (props) => {
         })
       }
       return nuevosDatos
-    }
-    , [datosFormulario.funcionProbabilidad, parametros.cantidadNumeros]
+    }, 
+    [datosFormulario.funcionProbabilidad, parametros.cantidadNumeros]
   )
-  funcionProbabilidad.sumatoriaProbabilidades = () => Number(funcionProbabilidad.generarParametros()
-    .reduce((probabilidad1, asociacion) => {
-      console.log({probabilidad1, asociacion})
-      return probabilidad1 + asociacion.p
-    } ,  0).toFixed(7)
+  funcionProbabilidad.sumatoriaProbabilidades = React.useMemo(
+    () => Number(Object.entries(datosFormulario.funcionProbabilidad)
+      .filter(([key, value]) => key.startsWith("p") && !Number.isNaN(value))
+      .map(([key, value]) => value).reduce((total, value) => total + Number(value), 0).toFixed(7)
+    ),
+    [datosFormulario.funcionProbabilidad]
   ),
   funcionProbabilidad.validacioesAdicionales = React.useCallback(() => {
     const validaciones =
       [
         {
-          criterio: () => funcionProbabilidad.sumatoriaProbabilidades() === 1,
+          criterio: () => funcionProbabilidad.sumatoriaProbabilidades === 1,
           mensaje: "La suma de las probabilidades (P) debe ser igual a 1.",
         },
         {
           criterio: () => funcionProbabilidad.generarParametros()
             .filter(asociacion => Number.isNaN(asociacion.x)).length === 0 && 
-              funcionProbabilidad.generarParametros().length !== 0 &&
               Object.entries(erroresFormulario.funcionProbabilidad || {}).length === 0
           ,
           mensaje: "Debe llenar todos los valores de X de manera correcta",
@@ -203,23 +190,24 @@ const InverseTransformationMethod = (props) => {
   return (
     <BaseLayout title={META.title} rightContent={<Description />}>
       <Form
-        ref={formularios.cantidadSimulaciones}
         formValue={datosFormulario}
         formError={erroresFormulario}
-        model={{
-          cantidadSimulaciones: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
-            .isRequired("Requerido"),
-        }}
+        model={SchemaModel({
+          cantidadSimulaciones: NumberType("requerido")
+            .range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo").isRequired("Requerido"),
+        })}
         onChange={valor => {
-          setDatosFormulario({
-            ...datosFormulario,
-            cantidadSimulaciones: valor,
-          })
+          setDatosFormulario(df => ({
+            ...df,
+            cantidadSimulaciones: valor.cantidadSimulaciones,
+          }))
         }}
-        onCheck={error => {
-          setErroresFormulario({
-            ...erroresFormulario,
-            cantidadSimulaciones: error,
+        onCheck={errores => {
+          setErroresFormulario(ef => {
+            console.log({ef_1: ef, errores})
+            return ({
+              ...errores,
+            })
           })
         }}
       >
@@ -229,20 +217,22 @@ const InverseTransformationMethod = (props) => {
         </Form.Group>
       </Form>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
-        ref={formularios.funcionProbabilidad}
         formValue={datosFormulario.funcionProbabilidad}
-        formError={erroresFormulario.funcionProbabilidad}
-        model={generarEsquemaFuncionProbabilidad()}
+        formError={erroresFormulario}
+        model={validadorFuncionProbabilidad}
         onChange={valor => {
-          setDatosFormulario({
-            ...datosFormulario,
+          console.log({ valor })
+          setDatosFormulario(df => ({
+            ...df,
             funcionProbabilidad: valor,
-          })
+          }))
         }}
-        onCheck={valor => {
-          setErroresFormulario({
-            ...erroresFormulario,
-            funcionProbabilidad: valor,
+        onCheck={errores => {
+          setErroresFormulario(ef => {
+            console.log({ef_2: ef, errores})
+            return ({
+              ...errores,
+            })
           })
         }}
       >
@@ -272,21 +262,18 @@ const InverseTransformationMethod = (props) => {
                 onClick={() => {
                   setDatosFormulario(df => {
                     const funcionProbabilidad = {...df.funcionProbabilidad}
-                    for (let _i = i; _i < parametros.cantidadNumeros; _i++) {
-                      if (funcionProbabilidad[`p_${_i+1}`]) {
-                        console.log(`p_${_i}`)
-                        funcionProbabilidad[`p_${_i}`] = funcionProbabilidad[`p_${_i+1}`]
+                    for (let i = i; i < datosFormulario.cantidadNumeros; i++) {
+                      if (funcionProbabilidad[`p_${i+1}`]) {
+                        console.log(`p_${i}`)
+                        funcionProbabilidad[`p_${i}`] = funcionProbabilidad[`p_${i+1}`]
                       }
-                      if (funcionProbabilidad[`x_${_i+1}`]) {
-                        console.log(`x_${_i}`)
-                        funcionProbabilidad[`x_${_i}`] = funcionProbabilidad[`x_${_i+1}`]
+                      if (funcionProbabilidad[`x_${i+1}`]) {
+                        console.log(`x_${i}`)
+                        funcionProbabilidad[`x_${i}`] = funcionProbabilidad[`x_${i+1}`]
                       }
                     }
-                    delete funcionProbabilidad[`p_${parametros.cantidadNumeros-1}`]
-                    delete funcionProbabilidad[`x_${parametros.cantidadNumeros-1}`]
-                    return {...df, funcionProbabilidad}
+                    return {...df, funcionProbabilidad, cantidadNumeros: df.cantidadNumeros-1}
                   })
-                  setParametros(p => ({ ...p, cantidadNumeros: p.cantidadNumeros-1 }))
                 }}
               >
                 <i className="bi bi-trash" />
@@ -296,11 +283,11 @@ const InverseTransformationMethod = (props) => {
               <div key="footer-sum" className="m-3">
                 <Latex>{String.raw`$\sum$`}</Latex>
                 &nbsp;
-                {funcionProbabilidad.sumatoriaProbabilidades()}
+                {funcionProbabilidad.sumatoriaProbabilidades}
               </div>,
               null,
               <Button key="footer-actions" appearance="primary" className="m-1" onClick={() => {
-                setParametros(p => ({...p, cantidadNumeros: p.cantidadNumeros+1}))
+                setDatosFormulario(df => ({...df, cantidadNumeros: df.cantidadNumeros+1}))
               }}>
                 <i className="bi bi-plus" />
               </Button>
