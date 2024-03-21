@@ -17,13 +17,15 @@ import "../../utils"
 const InverseTransformationMethod = (props) => {
   //#region configuracion
   const [funcionProbabilidad, setFuncionProbabilidad] = React.useState([])
-  const formularioFuncionProbabilidad = useMemo(
+  const funcionProbabilidadVistaFormulario = useMemo(
     () => funcionProbabilidad
       .map((item, index) => {
         const _item = {}
 
         if (item.p) { _item[`p_${index}`] = item.p }
+        else _item[`p_${index}`] = ""
         if (item.x) { _item[`x_${index}`] = item.x }
+        else _item[`x_${index}`] = ""
 
         return _item
       })
@@ -66,10 +68,13 @@ const InverseTransformationMethod = (props) => {
   useEffect(() => console.log({ erroresFormulario }), [erroresFormulario])
   
   const sumatoriaProbabilidades = React.useMemo(
-    () => Number(funcionProbabilidad
-      .filter(({p}) => !Number.isNaN(p))
-      .reduce((total, {p}) => total + Number(p), 0).toFixed(7)
-    ),
+    () => {
+      const result = Number(funcionProbabilidad
+        .filter(({ p }) => !Number.isNaN(p))
+        .reduce((total, { p }) => total + Number(p), 0).toFixed(7)
+      )
+      return !Number.isNaN(result) ? result : 0
+    },
     [funcionProbabilidad]
   )
   const validacioesAdicionales = React.useMemo(() => {
@@ -181,7 +186,7 @@ const InverseTransformationMethod = (props) => {
         </Form.Group>
       </Form>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
-        formValue={formularioFuncionProbabilidad}
+        formValue={funcionProbabilidadVistaFormulario}
         formError={erroresFormulario}
         model={validadorFuncionProbabilidad}
         onChange={value => {
