@@ -1,6 +1,6 @@
 import { Form, InputNumber, ButtonGroup, Button, Message } from "rsuite"
 import { SchemaModel, NumberType, StringType } from "schema-typed"
-import React, { useEffect, useMemo, useRef } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import Latex from "react-latex-next"
 import { useRouter } from "next/router"
 
@@ -16,7 +16,7 @@ import "../../utils"
 
 const InverseTransformationMethod = (props) => {
   //#region configuracion
-  const [funcionProbabilidad, setFuncionProbabilidad] = React.useState([])
+  const [funcionProbabilidad, setFuncionProbabilidad] = useState([])
   const funcionProbabilidadVista = useMemo(
     () => funcionProbabilidad
       .map((item, index) => {
@@ -32,16 +32,16 @@ const InverseTransformationMethod = (props) => {
       .reduce((all, item) => Object.assign(all, item), {}), 
     [funcionProbabilidad]
   )
-  const [cantidadNumeros, setCantidadNumeros] = React.useState(3)
-  const [cantidadSimulaciones, setCantidadSimulaciones] = React.useState(0)
+  const [cantidadNumeros, setCantidadNumeros] = useState(3)
+  const [cantidadSimulaciones, setCantidadSimulaciones] = useState(0)
   
-  const [parametros, setParametros] = React.useState({
+  const [parametros, setParametros] = useState({
     funcionProbabilidad: [],
     cantidadSimulaciones: 0,
   })
-  const [resultados, setResultados] = React.useState([])
+  const [resultados, setResultados] = useState([])
   
-  const validadorFuncionProbabilidad = React.useMemo(
+  const validadorFuncionProbabilidad = useMemo(
     () => {
       const schema = {}
       for (let i = 0; i < cantidadNumeros; i++) {
@@ -53,7 +53,7 @@ const InverseTransformationMethod = (props) => {
     }, 
     [cantidadNumeros]
   )
-  const [erroresFormulario, setErroresFormulario] = React.useState({
+  const [erroresFormulario, setErroresFormulario] = useState({
     cantidadSimulaciones: "Requerido",
   });
   const [erroresFuncionProbabilidad, setErroresFuncionProbabilidad] = useState([
@@ -77,7 +77,7 @@ const InverseTransformationMethod = (props) => {
   
   const windowSize = useWindowSize();
   
-  const sumatoriaProbabilidades = React.useMemo(
+  const sumatoriaProbabilidades = useMemo(
     () => {
       const result = Number(funcionProbabilidad
         .filter(({ p }) => !Number.isNaN(p))
@@ -87,7 +87,7 @@ const InverseTransformationMethod = (props) => {
     },
     [funcionProbabilidad]
   )
-  const validacioesAdicionales = React.useMemo(() => {
+  const validacioesAdicionales = useMemo(() => {
     const validaciones =
       [
         {
@@ -198,7 +198,7 @@ const InverseTransformationMethod = (props) => {
         </Form.Group>
       </Form>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
-        formValue={funcionProbabilidadVistaFormulario}
+        formValue={funcionProbabilidadVista}
         formError={erroresFuncionProbabilidadVista}
         model={validadorFuncionProbabilidad}
         onChange={value => {
