@@ -1,7 +1,7 @@
-import { Form, Input, MaskedInput, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Sidebar, Content, Divider } from "rsuite"
+import { Form, Button, ButtonGroup, InputNumber } from "rsuite"
 import { NumberType, SchemaModel } from "schema-typed";
 import React from "react"
-import Head from 'next/head'
+
 import { factorial } from "../../utils";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { Accordion } from "../../Components/Accordion";
@@ -34,7 +34,6 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
     noSimulaciones: "Requerido",
     noElementos: "Requerido",
   });
-  const [valores_x, setValores_x] = React.useState();
   // TODO put ii in its own hook
   const windowSize = useWindowSize();
 
@@ -45,8 +44,6 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
     const probabilidad = Number(datosFormulario.probabilidad);
     const noSimulaciones = Number(datosFormulario.noSimulaciones);
     const noElementos = Number(datosFormulario.noElementos);
-
-    //const _valores_x = Array(noElementos).fill(0).map((_, i) => i);
 
     const funcionProbabilidad = []
     for (let i = 0; i < noElementos + 1; i++) {

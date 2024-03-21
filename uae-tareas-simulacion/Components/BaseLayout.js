@@ -1,14 +1,13 @@
 import Head from "next/head"
-import { Container, Header, Content, Sidebar, CustomProvider, Navbar, Nav, Tag, Drawer } from "rsuite"
-import { SIMULADORES } from '../I18n/es/simulators'
+import { Container, Header, Content, Sidebar, CustomProvider, Nav, Tag, Drawer } from "rsuite"
 import Link from "next/link"
 import { useRouter } from "next/router"
-
-import 'katex/dist/katex.min.css'
-import { useEffect, useReducer, useState } from "react"
-import { Button } from "rsuite"
+import { useEffect, useState } from "react"
 import _ from "lodash"
 
+import { SIMULADORES } from '../I18n/es/simulators'
+
+import 'katex/dist/katex.min.css'
 
 
 export const BaseLayout = ({title, children, rightContent, ...props}) => {
