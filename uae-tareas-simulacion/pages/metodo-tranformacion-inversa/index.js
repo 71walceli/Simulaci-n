@@ -54,7 +54,12 @@ const InverseTransformationMethod = (props) => {
     [cantidadNumeros]
   )
   const [erroresFormulario, setErroresFormulario] = React.useState({
-    funcionProbabilidad: {},
+    p_0: "Requerido",
+    p_1: "Requerido",
+    p_2: "Requerido",
+    x_0: "Requerido",
+    x_1: "Requerido",
+    x_2: "Requerido",
     cantidadSimulaciones: "Requerido",
   });
   const windowSize = useWindowSize();
@@ -67,36 +72,23 @@ const InverseTransformationMethod = (props) => {
     ),
     [funcionProbabilidad]
   )
-  const validacioesAdicionales = React.useCallback(() => {
+  const validacioesAdicionales = React.useMemo(() => {
     const validaciones =
       [
         {
-          criterio: () => funcionProbabilidad.sumatoriaProbabilidades === 1,
+          criterio: () => sumatoriaProbabilidades === 1,
           mensaje: "La suma de las probabilidades (P) debe ser igual a 1.",
         },
         {
-          criterio: () => funcionProbabilidad.generarParametros()
-            .filter(asociacion => Number.isNaN(asociacion.x)).length === 0 && 
-              Object.entries(erroresFormulario.funcionProbabilidad || {}).length === 0
-          ,
-          mensaje: "Debe llenar todos los valores de X de manera correcta",
+          criterio: () => Object.entries(erroresFormulario || {}).length === 0,
+          mensaje: "Debe llenar todos los campos de manera correcta.",
         },
         {
           criterio: () => {
-            const valores = funcionProbabilidad.generarParametros()
-            const counter = {}
-            for (let i=0; i<valores.length; i++) {
-              const x = valores[i].x;
-              if (!Number.isNaN(x)) 
-                counter[x] = counter[x] ? counter[x]+1 : 1
-              if (counter[x] > 1)
-                return false
-              // TODO Si se cuentan más de 2 elementos, regresar 2 veces.
-            }
-            return true
-          }
-          ,
-          mensaje: "No puede haber 2 valores de X que sean iguales",
+            const valores_x = funcionProbabilidad.map(v => v.x).filter(x => x).sort()
+            return valores_x.findIndex((x, i) => x === valores_x[i-1]) === -1
+          },
+          mensaje: "No puede haber 2 valores de X iguales.",
         },
       ]
     return validaciones.map(regla => !regla.criterio() && regla.mensaje).filter(error => error)
@@ -261,7 +253,7 @@ const InverseTransformationMethod = (props) => {
               <div key="footer-sum" className="m-3">
                 <Latex>{String.raw`$\sum$`}</Latex>
                 &nbsp;
-                {funcionProbabilidad.sumatoriaProbabilidades}
+                {sumatoriaProbabilidades}
               </div>,
               null,
               <Button key="footer-actions" appearance="primary" className="m-1" onClick={() => {
@@ -272,19 +264,23 @@ const InverseTransformationMethod = (props) => {
             ]])
           }
         />
-        {/* {funcionProbabilidad.validacioesAdicionales().length > 0 && (
+        {validacioesAdicionales.length > 0 && (
           <Message type="error">
             <h4>Errores de vali                                                                   dación</h4>
             <ul>{
-              funcionProbabilidad.validacioesAdicionales().map((error) => (
+              validacioesAdicionales.map((error) => (
                 <li key={error.hashCode()} className="derecha">{ error }</li>
               ))
             }</ul>
           </Message>
-        )} */}
+        )}
       </Form>
       <ButtonGroup>
-        <Button appearance="primary" onClick={() => calcular(datosFormulario)}>Siguiente</Button>
+        <Button appearance="primary" disabled={validacioesAdicionales.length !== 0}
+          onClick={() => calcular({funcionProbabilidad, cantidadSimulaciones})}
+        >
+          Siguiente
+        </Button>
       </ButtonGroup>
       {resultados.length > 0 &&
         <ResponsiveTable columns={randomNumbers.columns} rows={resultados} />
