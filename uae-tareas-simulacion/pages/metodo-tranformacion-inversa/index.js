@@ -154,23 +154,39 @@ const InverseTransformationMethod = (props) => {
       return
     }
     if (schemaModelValidator.isValid(query)) {
-      const p = query.p.split(",")
-      const x = query.x.split(",")
-      const smallestLength = p.length < x.length ? p.length : x.length
+      const pValues = query.p.split(",")
+      const xValues = query.x.split(",")
+
+      const xValues_sorted = xValues.sort()
+      if (
+        xValues_sorted.findIndex((x, i) => x === xValues_sorted[i - 1]) === -1
+          && pValues.reduce((total, p) => total + p, 0) === 1
+      ) {
+        return
+      }
+
+      const _cantidadSimulaciones = Number(query.n)
+      const smallestLength = pValues.length < xValues.length ? pValues.length : xValues.length
       if (smallestLength < 3) {
         // TODO Warn user that 2 value pairs are needed at least.
         return
       }
+      setErroresFuncionProbabilidad([])
+      setErroresFormulario({})
       
-      setFuncionProbabilidad(Array(x.length).fill(null)
+      const _funcionProbabilidad = Array(xValues.length).fill(null)
         .map((_, i) => ({
-          p: Number(p[i]),
-          x: Number(x[i]),
+          p: Number(pValues[i]),
+          x: Number(xValues[i]),
         }))
-      )
+      setFuncionProbabilidad(_funcionProbabilidad)
       setCantidadNumeros(smallestLength)
       setCantidadSimulaciones(Number(query.n))
-      calcular({funcionProbabilidad, cantidadSimulaciones})
+      
+      calcular({
+        funcionProbabilidad: _funcionProbabilidad, 
+        cantidadSimulaciones: _cantidadSimulaciones
+      })
     }
   }, [query])
 
