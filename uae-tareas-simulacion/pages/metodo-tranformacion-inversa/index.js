@@ -17,7 +17,7 @@ import "../../utils"
 const InverseTransformationMethod = (props) => {
   //#region configuracion
   const [funcionProbabilidad, setFuncionProbabilidad] = React.useState([])
-  const funcionProbabilidadVistaFormulario = useMemo(
+  const funcionProbabilidadVista = useMemo(
     () => funcionProbabilidad
       .map((item, index) => {
         const _item = {}
@@ -32,8 +32,6 @@ const InverseTransformationMethod = (props) => {
       .reduce((all, item) => Object.assign(all, item), {}), 
     [funcionProbabilidad]
   )
-  useEffect(() => console.log({funcionProbabilidad}), [funcionProbabilidad])
-  useEffect(() => console.log({formularioFuncionProbabilidad}), [formularioFuncionProbabilidad])
   const [cantidadNumeros, setCantidadNumeros] = React.useState(3)
   const [cantidadSimulaciones, setCantidadSimulaciones] = React.useState(0)
   
@@ -56,16 +54,28 @@ const InverseTransformationMethod = (props) => {
     [cantidadNumeros]
   )
   const [erroresFormulario, setErroresFormulario] = React.useState({
-    p_0: "Requerido",
-    p_1: "Requerido",
-    p_2: "Requerido",
-    x_0: "Requerido",
-    x_1: "Requerido",
-    x_2: "Requerido",
     cantidadSimulaciones: "Requerido",
   });
+  const [erroresFuncionProbabilidad, setErroresFuncionProbabilidad] = useState([
+    { p: "Requerido", x: "Requerido" },
+    { p: "Requerido", x: "Requerido" },
+    { p: "Requerido", x: "Requerido" },
+  ])
+  const erroresFuncionProbabilidadVista = useMemo(
+    () => erroresFuncionProbabilidad
+      .map((item, index) => {
+        const _item = {}
+
+        if (item.p) { _item[`p_${index}`] = item.p }
+        if (item.x) { _item[`x_${index}`] = item.x }
+
+        return _item
+      })
+      .reduce((all, item) => Object.assign(all, item), {}), 
+    [funcionProbabilidad, cantidadNumeros]
+  )
+  
   const windowSize = useWindowSize();
-  useEffect(() => console.log({ erroresFormulario }), [erroresFormulario])
   
   const sumatoriaProbabilidades = React.useMemo(
     () => {
@@ -85,19 +95,22 @@ const InverseTransformationMethod = (props) => {
           mensaje: "La suma de las probabilidades (P) debe ser igual a 1.",
         },
         {
-          criterio: () => Object.entries(erroresFormulario || {}).length === 0,
+          criterio: () => erroresFormulario.cantidadSimulaciones === undefined
+            && erroresFuncionProbabilidad.reduce(
+              (total, pair) => total + Object.entries(pair).length, 0
+          ) === 0,
           mensaje: "Debe llenar todos los campos de manera correcta.",
         },
         {
           criterio: () => {
             const valores_x = funcionProbabilidad.map(v => v.x).filter(x => x).sort()
-            return valores_x.findIndex((x, i) => x === valores_x[i-1]) === -1
+            return valores_x.findIndex((x, i) => x === valores_x[i - 1]) === -1
           },
           mensaje: "No puede haber 2 valores de X iguales.",
         },
       ]
     return validaciones.map(regla => !regla.criterio() && regla.mensaje).filter(error => error)
-  }, [funcionProbabilidad, parametros.cantidadNumeros])
+  }, [funcionProbabilidad, cantidadNumeros, erroresFormulario])
 
   const calcular = ({funcionProbabilidad, cantidadSimulaciones}) => {
     setParametros(_parametros => {
@@ -173,7 +186,6 @@ const InverseTransformationMethod = (props) => {
         onChange={value => setCantidadSimulaciones(Number(value.cantidadSimulaciones))}
         onCheck={errores => {
           setErroresFormulario(ef => {
-            console.log({ef_1: ef, errores})
             return ({
               ...errores,
             })
@@ -187,10 +199,9 @@ const InverseTransformationMethod = (props) => {
       </Form>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={funcionProbabilidadVistaFormulario}
-        formError={erroresFormulario}
+        formError={erroresFuncionProbabilidadVista}
         model={validadorFuncionProbabilidad}
         onChange={value => {
-          console.log({value})
           const getIndex = key => Number(key.substring(2))
           const maxIndex = Object.keys(value)
             .map(getIndex)
@@ -198,7 +209,6 @@ const InverseTransformationMethod = (props) => {
           const _funcionProbabilidad = Array.from({length: maxIndex+1}, () => ({}))
 
           Object.entries(value).forEach(([key, value]) => {
-            console.log({ key,value })
             if (key.startsWith("p") && value !== undefined && value !== "") {
               _funcionProbabilidad[getIndex(key)].p = Number(value)
             }
@@ -209,13 +219,23 @@ const InverseTransformationMethod = (props) => {
 
           setFuncionProbabilidad(_funcionProbabilidad)
         }}
-        onCheck={errores => {
-          setErroresFormulario(ef => {
-            console.log({ef_2: ef, errores})
-            return ({
-              ...errores,
-            })
+        onCheck={errors => {
+          const getIndex = key => Number(key.substring(2))
+          const maxIndex = Object.keys(errors)
+            .map(getIndex)
+            .reduce((max, number) => number > max ? number : max, 0)
+          const _funcionProbabilidadErrores = Array.from({length: maxIndex+1}, () => ({}))
+
+          Object.entries(errors).forEach(([key, value]) => {
+            if (key.startsWith("p") && value !== undefined && value !== "") {
+              _funcionProbabilidadErrores[getIndex(key)].p = value
+            }
+            if (key.startsWith("x") && value !== undefined && value !== "") {
+              _funcionProbabilidadErrores[getIndex(key)].x = value
+            }
           })
+
+          setErroresFuncionProbabilidad(_funcionProbabilidadErrores)
         }}
       >
         <ResponsiveTable 
@@ -245,8 +265,12 @@ const InverseTransformationMethod = (props) => {
                   setFuncionProbabilidad(fp => {
                     fp = [...fp]
                     fp.splice(i, 1)
-                    console.log({fp})
                     return fp
+                  })
+                  setErroresFuncionProbabilidad(efp => {
+                    efp = [...efp]
+                    efp.splice(i, 1)
+                    return efp
                   })
                   setCantidadNumeros(cn => cn-1)
                 }}
@@ -262,6 +286,7 @@ const InverseTransformationMethod = (props) => {
               </div>,
               null,
               <Button key="footer-actions" appearance="primary" className="m-1" onClick={() => {
+                setErroresFuncionProbabilidad(efp => [...efp].concat({ p: "Requerido", x: "Requerido" }))
                 setCantidadNumeros(cn => cn+1)
               }}>
                 <i className="bi bi-plus" />
