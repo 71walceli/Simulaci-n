@@ -12,6 +12,7 @@ import { Description, META } from "../../I18n/es/simulators/InverseTransformatio
 import { useSchemaModelValidator } from "../../controllers/useSchemaModelValidator"
 
 import "../../utils"
+import { calcularDistribucionAcumulada } from "../../data/calcularDistribucionAcumulada"
 
 
 const InverseTransformationMethod = (props) => {
@@ -113,13 +114,13 @@ const InverseTransformationMethod = (props) => {
   }, [funcionProbabilidad, cantidadNumeros, erroresFormulario])
 
   const calcular = ({funcionProbabilidad, cantidadSimulaciones}) => {
+    funcionProbabilidad = calcularDistribucionAcumulada(funcionProbabilidad)
+
     setParametros(_parametros => {
       // TODO Preccomute accumulated values
       const obtenerPorMetodoTransformacionInversa = (funcionProbabilidad, u) => {
-        let probabilidadAcumulada = 0
         for (let i = 0; i < funcionProbabilidad.length; i++) {
-          probabilidadAcumulada += funcionProbabilidad[i].p
-          if (u < probabilidadAcumulada) {
+          if (u < funcionProbabilidad[i].pA) {
             return funcionProbabilidad[i].x
           }
         }
@@ -167,7 +168,7 @@ const InverseTransformationMethod = (props) => {
 
       const _cantidadSimulaciones = Number(query.n)
       const smallestLength = pValues.length < xValues.length ? pValues.length : xValues.length
-      if (smallestLength < 3) {
+      if (smallestLength < 2) {
         // TODO Warn user that 2 value pairs are needed at least.
         return
       }
