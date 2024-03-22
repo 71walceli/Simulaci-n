@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Latex from "react-latex-next";
+
 import { objectToQueryString } from "../../../misc";
+
 
 export const META = {
   abbreviation: "M. T. I.",
@@ -63,7 +65,7 @@ export function Description() {
             p[randomIndex] = 1 - sum(p)
           }
           
-          const x = Array(_n).fill(null).map((_,i) => i)
+          const x = Array(_n).fill(null).map((_,i) => i+1)
           
           replace(objectToQueryString({p: p.join(), x: x.join(), n: 100}))
         }}>
