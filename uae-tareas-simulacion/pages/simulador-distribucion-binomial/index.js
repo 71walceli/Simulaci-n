@@ -37,7 +37,6 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
     noSimulaciones: "Requerido",
     noElementos: "Requerido",
   });
-  // TODO put ii in its own hook
   const windowSize = useWindowSize();
 
   // Function to calculate the value of nCr
@@ -126,7 +125,7 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
         onChange={setDatosFormulario} onCheck={setErroresFormulario}
-        onSubmit={calcular} ref={formulario}
+        onSubmit={() => calcular(datosFormulario)} ref={formulario}
       >
         <Form.Group controlId="probabilidad">
           <Form.ControlLabel>
