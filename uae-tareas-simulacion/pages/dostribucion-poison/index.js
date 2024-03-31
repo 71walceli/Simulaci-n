@@ -1,8 +1,9 @@
-import { 
-  Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content} from "rsuite"
+import { Form, Button, ButtonGroup, InputNumber } from "rsuite"
 import { NumberType, SchemaModel } from "schema-typed";
 import React, { useEffect, useMemo } from "react"
-import Head from 'next/head'
+import Latex from "react-latex-next";
+import { useRouter } from "next/router";
+
 import { factorial } from "../../utils";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
@@ -10,7 +11,6 @@ import { Accordion } from "../../Components/Accordion";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
 import { Description, META } from "../../I18n/es/simulators/PoissonDistribution";
-import { useRouter } from "next/router";
 
 
 const _20230116_1_dostribucion_poison = (props) => {
@@ -122,7 +122,7 @@ const _20230116_1_dostribucion_poison = (props) => {
         onSubmit={() => calcular(datosFormulario)} ref={formulario}
       >
         <Form.Group controlId="promedio">
-          <Form.ControlLabel>Valor promedio L</Form.ControlLabel>
+          <Form.ControlLabel>Valor promedio <Latex>$\lambda $</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} min={0} name="promedio"
           />
         </Form.Group>
