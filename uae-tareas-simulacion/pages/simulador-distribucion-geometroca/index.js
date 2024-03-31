@@ -1,15 +1,15 @@
 import { 
-  Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content, Divider 
-} from "rsuite"
+  Form, Button, ButtonGroup, InputNumber} from "rsuite"
 import { NumberType, SchemaModel } from "schema-typed";
-import React from "react"
-import Head from 'next/head'
+import { useRouter } from "next/router";
+import React, { useEffect, useMemo } from "react"
+
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { Accordion } from "../../Components/Accordion";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
-import { SIMULADORES } from '../../I18n/es/simulators';
+import { Description, META } from "../../I18n/es/simulators/GeometricDistribution";
 
 
 const _20221230_1_simulador_distribucion_geometroca = (props) => {
@@ -34,9 +34,9 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
   // TODO put ii in its own hook
   const windowSize = useWindowSize();
 
-  const calcular = () => {
-    const probabilidad = Number(datosFormulario.probabilidad);
-    const noSimulaciones = Number(datosFormulario.noSimulaciones);
+  const calcular = (parameters) => {
+    const probabilidad = Number(parameters.probabilidad);
+    const noSimulaciones = Number(parameters.noSimulaciones);
     
     const resultados = []
     for (let i = 1; i <= noSimulaciones; i++) {
@@ -83,19 +83,30 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
     };
   }, [formulario]);
 
-  const tableStyle = {
-    maxHeight: "calc(100vh - 48px)",
-    overflowY: "auto",
-  }
+  const { query: _query } = useRouter()
+  const query = useMemo(() => ({
+    probabilidad: _query.p,
+    noSimulaciones: _query.n,
+  }), [_query])
+  useEffect(() => {
+    if (Object.keys(query).length === 0)
+      return;
+    const validationResult = _esquemaFormulario.check(query)
+    if (Object.values(validationResult).filter(x => x.hasError).length === 0) {
+      console.log({query, validationResult})
+      calcular(query)
+      setDatosFormulario(query)
+      setErroresFormulario({})
+    }
+  }, [query])
 
-  const INDICE = 4;
   return (
-    <BaseLayout title={SIMULADORES[INDICE].title}>
+    <BaseLayout title={META.title} rightContent={<Description />}>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
         onChange={setDatosFormulario} onCheck={setErroresFormulario}
-        onSubmit={calcular} ref={formulario}
+        onSubmit={() => calcular(datosFormulario)} ref={formulario}
       >
         <Form.Group controlId="probabilidad">
           <Form.ControlLabel>Probabilidad de éxito</Form.ControlLabel>

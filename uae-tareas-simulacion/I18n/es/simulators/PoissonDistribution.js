@@ -16,7 +16,7 @@ export function Description() {
   return <>
     <p>
       La distribución de Poisson es una distribución de probabilidad discreta que permite entender 
-      cuéntas veces un evento puede ocurrir en un periodo de tiempo o en un espacio definido, 
+      cuántas veces un evento puede ocurrir en un periodo de tiempo o en un espacio definido, 
       cuando los eventos ocurren de forma independiente a una tasa promedio constante. Es 
       especialmente útil para modelar fenómenos donde la ocurrencia de eventos es rara pero se puede
       esperar un número considerable de eventos en un gran número de intervalos.
