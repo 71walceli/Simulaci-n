@@ -1,15 +1,16 @@
 import { 
   Form, Button, CustomProvider, ButtonGroup, InputNumber, Container, Header, Content} from "rsuite"
 import { NumberType, SchemaModel } from "schema-typed";
-import React from "react"
+import React, { useEffect, useMemo } from "react"
 import Head from 'next/head'
 import { factorial } from "../../utils";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { Accordion } from "../../Components/Accordion";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
-import { SIMULADORES } from '../../I18n/es/simulators';
 import { BaseLayout } from "../../Components/BaseLayout";
+import { Description, META } from "../../I18n/es/simulators/PoissonDistribution";
+import { useRouter } from "next/router";
 
 
 const _20230116_1_dostribucion_poison = (props) => {
@@ -34,10 +35,10 @@ const _20230116_1_dostribucion_poison = (props) => {
   });
   const windowSize = useWindowSize();
 
-  const calcular = () => {
+  const calcular = (parameters) => {
     const poisson = (i) => Math.E ** -promedio * promedio ** i / factorial(i)
-    const promedio = Number(datosFormulario.promedio);
-    const noSimulaciones = Number(datosFormulario.noSimulaciones);
+    const promedio = Number(parameters.promedio);
+    const noSimulaciones = Number(parameters.noSimulaciones);
     
     const probabilidad1 = Math.E ** -promedio;
     const funcionProbabilidad = [
@@ -73,8 +74,9 @@ const _20230116_1_dostribucion_poison = (props) => {
 
     setParametrosAlgoritmo({ funcionProbabilidad })
 
+    // TODO Count values either by counting result.x values to improve performance.
     const conteos = []
-    for (let i = 0; i <= resultados.length; i++) {
+    for (let i = 0; i <= promedio; i++) {
       const conteo = resultados.filter(r => r.x === i).length;
       if (conteo > 0)
         conteos.push({ i, conteo })
@@ -92,16 +94,32 @@ const _20230116_1_dostribucion_poison = (props) => {
     };
   }, [formulario]);
 
-  const INDICE = 2;
+  const { query: _query } = useRouter()
+  const query = useMemo(() => ({
+    promedio: _query.l,
+    noSimulaciones: _query.n,
+  }), [_query])
+  useEffect(() => {
+    if (Object.keys(query).length === 0)
+      return;
+    const validationResult = _esquemaFormulario.check(query)
+    if (Object.values(validationResult).filter(x => x.hasError).length === 0) {
+      console.log({query, validationResult})
+      calcular(query)
+      setDatosFormulario(query)
+      setErroresFormulario({})
+    }
+  }, [query])
+
   return (
-    <BaseLayout title={SIMULADORES[INDICE].title} style={{
+    <BaseLayout title={META.title} rightContent={<Description />} style={{
       textAlign: "center",
     }}>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
         onChange={setDatosFormulario} onCheck={setErroresFormulario}
-        onSubmit={calcular} ref={formulario}
+        onSubmit={() => calcular(datosFormulario)} ref={formulario}
       >
         <Form.Group controlId="promedio">
           <Form.ControlLabel>Valor promedio L</Form.ControlLabel>
