@@ -1,6 +1,8 @@
 import { Form, Button, ButtonGroup, InputNumber } from "rsuite"
 import { NumberType, SchemaModel } from "schema-typed";
-import React from "react"
+import React, { useEffect, useMemo } from "react"
+import Latex from "react-latex-next";
+import { useRouter } from "next/router";
 
 import { factorial } from "../../utils";
 import { useWindowSize } from "../../hooks/useWindowSize";
@@ -9,6 +11,7 @@ import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
 import { SIMULADORES } from '../../I18n/es/simulators';
+import { Description, META } from "../../I18n/es/simulators/BinomialDistribution";
 
 
 const _20221219_2_simulador_distribucion_binomial = (props) => {
@@ -40,10 +43,10 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
   // Function to calculate the value of nCr
   const calculate_nCr = (n, r) => factorial(n) / (factorial(r) * factorial(n - r))
 
-  const calcular = () => {
-    const probabilidad = Number(datosFormulario.probabilidad);
-    const noSimulaciones = Number(datosFormulario.noSimulaciones);
-    const noElementos = Number(datosFormulario.noElementos);
+  const calcular = (parameters) => {
+    const probabilidad = Number(parameters.probabilidad);
+    const noSimulaciones = Number(parameters.noSimulaciones);
+    const noElementos = Number(parameters.noElementos);
 
     const funcionProbabilidad = []
     for (let i = 0; i < noElementos + 1; i++) {
@@ -99,9 +102,26 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
     };
   }, [formulario]);
 
-  const INDICE = 3;
+  const { query: _query } = useRouter()
+  const query = useMemo(() => ({
+    probabilidad: _query.p,
+    noSimulaciones: _query.n,
+    noElementos: _query.k,
+  }), [_query])
+  useEffect(() => {
+    if (Object.keys(query).length === 0)
+      return;
+    const validationResult = _esquemaFormulario.check(query)
+    if (Object.values(validationResult).filter(x => x.hasError).length === 0) {
+      console.log({query, validationResult})
+      calcular(query)
+      setDatosFormulario(query)
+      setErroresFormulario({})
+    }
+  }, [query])
+
   return (
-    <BaseLayout title={SIMULADORES[INDICE].title}>
+    <BaseLayout title={META.title} rightContent={<Description />}>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
@@ -109,19 +129,25 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
         onSubmit={calcular} ref={formulario}
       >
         <Form.Group controlId="probabilidad">
-          <Form.ControlLabel>Probabilidad de éxito</Form.ControlLabel>
+          <Form.ControlLabel>
+            Probabilidad de éxito <Latex>$p$</Latex>
+          </Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0}
             min={0} max={1} step={0.01} name="probabilidad"
           />
         </Form.Group>
         <Form.Group controlId="noSimulaciones">
-          <Form.ControlLabel># Simulaciones</Form.ControlLabel>
+          <Form.ControlLabel>
+            Número de simulaciones <Latex>$n$</Latex>
+          </Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={10} min={1}
             name="noSimulaciones"
           />
         </Form.Group>
         <Form.Group controlId="noElementos">
-          <Form.ControlLabel># Elementos</Form.ControlLabel>
+          <Form.ControlLabel>
+            Número de elementos <Latex>$k$</Latex>
+          </Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={3} min={1}
             name="noElementos"
           />
