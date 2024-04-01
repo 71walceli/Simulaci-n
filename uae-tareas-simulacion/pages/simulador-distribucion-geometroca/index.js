@@ -10,6 +10,7 @@ import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
 import { Description, META } from "../../I18n/es/simulators/GeometricDistribution";
+import Latex from "react-latex-next";
 
 
 const _20221230_1_simulador_distribucion_geometroca = (props) => {
@@ -109,7 +110,7 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
         onSubmit={() => calcular(datosFormulario)} ref={formulario}
       >
         <Form.Group controlId="probabilidad">
-          <Form.ControlLabel>Probabilidad de éxito</Form.ControlLabel>
+          <Form.ControlLabel>Probabilidad <Latex>$p$</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0}
             min={0} max={1} step={0.01} name="probabilidad"
           />
