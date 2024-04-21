@@ -9,13 +9,11 @@ import { Accordion } from "../../Components/Accordion";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
-import { Description, META } from "../../I18n/es/simulators/GeometricDistribution";
 import { T } from "../../I18n"
 
 
 const _20221230_1_simulador_distribucion_geometroca = (props) => {
   const { query: _query, locale } = useRouter()
-  console.log({locale, T})
 
   const _formularioLimpio = {
     probabilidad: "0",
@@ -96,10 +94,10 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
     }
   }, [query])
 
+
+  const SimInfo = T[locale].simulators.geometricDistribution;
   return (
-    <BaseLayout title={T[locale].simulators.geometricDistribution.META.title} 
-      rightContent={<Description />}
-    >
+    <BaseLayout title={SimInfo.META.title} rightContent={<SimInfo.Description />} >
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
@@ -108,15 +106,13 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
       >
         <Form.Group controlId="probabilidad">
           <Form.ControlLabel>{T[locale].fields.probabolity} <Latex>$p$</Latex></Form.ControlLabel>
-          <Form.Control accepter={InputNumber} defaultValue={0}
+          <Form.Control accepter={InputNumber} defaultValue={0} 
             min={0} max={1} step={0.01} name="probabilidad"
           />
         </Form.Group>
         <Form.Group controlId="noSimulaciones">
           <Form.ControlLabel>{T[locale].fields.numSimulations}</Form.ControlLabel>
-          <Form.Control accepter={InputNumber} defaultValue={10} min={1}
-            name="noSimulaciones"
-          />
+          <Form.Control accepter={InputNumber} defaultValue={10} min={1} name="noSimulaciones" />
         </Form.Group>
         <ButtonGroup>
           <Button type="submit" appearance="primary"
@@ -135,9 +131,7 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
       )}
       {resultados?.resultados?.length > 0 && (
         <Accordion header={T[locale].simulationResults} style={{ marginTop: "1em" }}>
-          <ResponsiveTable columns={randomNumbers.columns} 
-            rows={resultados.resultados}
-          />
+          <ResponsiveTable columns={randomNumbers.columns} rows={resultados.resultados} />
         </Accordion>
       )}
       {resultados?.conteos?.length > 0 && (

@@ -16,8 +16,13 @@ export const T = {
   },
   fields: {
     probabolity: "Probability",
+    value: "Value",
     numSimulations: "# Simulations",
     average: "Average Value",
+    numElements: "# Elements",
+    multiplier: "Multiplier", 
+    modulus: "Modulus",
+    seed: "Seed", 
   },
   simulators,
   metaList,
@@ -25,4 +30,5 @@ export const T = {
   probabilityFunction: "Probability Function",
   simulationResults: "Simulation Results",
   valuesCount: "Values Count",
+  validationErrors: "Validation errors",
 }

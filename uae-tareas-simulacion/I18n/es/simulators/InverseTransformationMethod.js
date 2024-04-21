@@ -76,3 +76,8 @@ export function Description() {
     </ul>
   </>;
 }
+export const T = {
+  allFieldsMustBeCorrect: "Debe llenar todos los campos de manera correcta.",
+  sumOfProbEqual1: "Suma de probabilidades (P) debe ser 1.",
+  NoTwoSameValues: "No puede haber 2 valores de X iguales.",
+}

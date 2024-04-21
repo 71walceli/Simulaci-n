@@ -10,37 +10,46 @@ import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { Accordion } from "../../Components/Accordion";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
-import { Description, META } from "../../I18n/es/simulators/PoissonDistribution";
+import { T } from "../../I18n";
 
 
 const _20230116_1_dostribucion_poison = (props) => {
+  const { query: _query, locale } = useRouter()
+
   const _formularioLimpio = {
     promedio: "10",
     noSimulaciones: "100",
   };
   const _esquemaFormulario = SchemaModel({
-    promedio: NumberType("Requerido")
-      .range(0, Number.MAX_SAFE_INTEGER, "Debe ser un real positivo")
-      .addRule(v => v > 0, "No debe ser nulo.").isRequired("Requerido"),
-    noSimulaciones: NumberType("Requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
-      .isInteger("Debe ser entero.").isRequired("Requerido"),
+    promedio: NumberType(T[locale].errors.forms.numeric)
+      .range(0, Number.MAX_SAFE_INTEGER, T[locale].errors.forms.number.positive)
+      .addRule(v => v > 0, T[locale].errors.forms.number.positive)
+      .isRequired(T[locale].errors.forms.required),
+    noSimulaciones: NumberType(T[locale].errors.forms.numeric)
+      .range(1, Number.MAX_SAFE_INTEGER, T[locale].errors.forms.number.positive)
+      .isInteger(T[locale].errors.forms.number.integer)
+      .isRequired(T[locale].errors.forms.required),
   });
-  const formulario = React.useRef();
   const [datosFormulario, setDatosFormulario] = React.useState(_formularioLimpio);
   const [parametrosAlgoritmo, setParametrosAlgoritmo] = React.useState(_formularioLimpio);
   const [resultados, setResultados] = React.useState({});
-  const [erroresFormulario, setErroresFormulario] = React.useState({
-    probabilidad: "Requerido",
-    noSimulaciones: "Requerido",
-  });
+  const [erroresFormulario, setErroresFormulario] = React.useState({});
   const windowSize = useWindowSize();
 
+  const poisson = (i, promedio) => {
+    console.log({
+      i,
+      promedio,
+      E: Math.E,
+      factorial: factorial(i),
+    })
+    return Math.E ** -promedio * promedio ** i / factorial(i);
+  }
   const calcular = (parameters) => {
-    const poisson = (i) => Math.E ** -promedio * promedio ** i / factorial(i)
     const promedio = Number(parameters.promedio);
     const noSimulaciones = Number(parameters.noSimulaciones);
     
-    const probabilidad1 = Math.E ** -promedio;
+    const probabilidad1 = poisson(0, promedio);
     const funcionProbabilidad = [
       {
         i: 0, 
@@ -55,9 +64,9 @@ const _20230116_1_dostribucion_poison = (props) => {
     
     for (let i = 0; i < noSimulaciones; i++) {
       const u = resultados[i].u
-      for (let j = 0; j< 170; j++) {
+      for (let j = 0; j< 170; j++) {  // WHY 170?
         if (!funcionProbabilidad[j]) {
-          const probabilidad = poisson(j);
+          const probabilidad = poisson(j, promedio);
           funcionProbabilidad.push({
             i: j, 
             probabilidad,
@@ -85,16 +94,6 @@ const _20230116_1_dostribucion_poison = (props) => {
     setResultados({ resultados, conteos })
   };
 
-  React.useEffect(() => {
-    if (formulario.current) {
-      formulario.current.check();
-    }
-    return () => {
-      formulario.current = null;
-    };
-  }, [formulario]);
-
-  const { query: _query } = useRouter()
   const query = useMemo(() => ({
     promedio: _query.l,
     noSimulaciones: _query.n,
@@ -111,52 +110,48 @@ const _20230116_1_dostribucion_poison = (props) => {
     }
   }, [query])
 
+
+  const SimInfo = T[locale].simulators.poissonDistribution;
   return (
-    <BaseLayout title={META.title} rightContent={<Description />} style={{
-      textAlign: "center",
-    }}>
+    <BaseLayout title={SimInfo.META.title} rightContent={<SimInfo.Description />} >
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
         onChange={setDatosFormulario} onCheck={setErroresFormulario}
-        onSubmit={() => calcular(datosFormulario)} ref={formulario}
+        onSubmit={() => calcular(datosFormulario)}
       >
         <Form.Group controlId="promedio">
-          <Form.ControlLabel>Valor promedio <Latex>$\lambda $</Latex></Form.ControlLabel>
-          <Form.Control accepter={InputNumber} min={0} name="promedio"
-          />
+          <Form.ControlLabel>{T[locale].fields.average} <Latex>$\lambda $</Latex></Form.ControlLabel>
+          <Form.Control accepter={InputNumber} min={0} name="promedio" min={0} />
         </Form.Group>
         <Form.Group controlId="noSimulaciones">
-          <Form.ControlLabel># Simulaciones</Form.ControlLabel>
-          <Form.Control accepter={InputNumber} min={1}
-            name="noSimulaciones"
-          />
+          <Form.ControlLabel>{T[locale].fields.numSimulations}</Form.ControlLabel>
+          <Form.Control accepter={InputNumber} min={1} name="noSimulaciones" />
         </Form.Group>
         <ButtonGroup>
           <Button type="submit" appearance="primary"
             disabled={Object.entries(erroresFormulario).length > 0}
           >
-            Calcular
+            {T[locale].compute}
           </Button>
         </ButtonGroup>
       </Form>
-      {/* TODO Hcer componente de tablas estándar */}
       {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-        <Accordion header="Distribución de probabilidad" defaultExpanded>
+        <Accordion header={T[locale].probabilityFunction} defaultExpanded>
           <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
             rows={parametrosAlgoritmo.funcionProbabilidad}
           />
         </Accordion>
       )}
       {resultados?.resultados?.length > 0 && (
-        <Accordion header="Resultados de simulación" style={{ marginTop: "2em" }}>
+        <Accordion header={T[locale].simulationResults} style={{ marginTop: "2em" }}>
           <ResponsiveTable columns={randomNumbers.columns}
             rows={resultados.resultados}
           />
         </Accordion>
       )}
       {resultados?.conteos?.length > 0 && (
-        <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
+        <Accordion header={T[locale].valuesCount} defaultExpanded style={{ marginTop: "2em" }}>
           <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
         </Accordion>
       )}

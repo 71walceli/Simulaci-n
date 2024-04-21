@@ -13,20 +13,28 @@ import { useSchemaModelValidator } from "../../controllers/useSchemaModelValidat
 
 import "../../utils"
 import { calcularDistribucionAcumulada } from "../../data/calcularDistribucionAcumulada"
+import { T } from "../../I18n"
 
 
 const InverseTransformationMethod = (props) => {
-  //#region configuracion
+  const { query, locale } = useRouter()
+
   const [funcionProbabilidad, setFuncionProbabilidad] = useState([])
   const funcionProbabilidadVista = useMemo(
     () => funcionProbabilidad
       .map((item, index) => {
         const _item = {}
 
-        if (item.p) { _item[`p_${index}`] = item.p }
-        else _item[`p_${index}`] = ""
-        if (item.x) { _item[`x_${index}`] = item.x }
-        else _item[`x_${index}`] = ""
+        if (item.p) {
+          _item[`p_${index}`] = item.p
+        } else { 
+          _item[`p_${index}`] = ""
+        }
+        if (item.x) {
+          _item[`x_${index}`] = item.x
+        } else { 
+          _item[`x_${index}`] = ""
+        }
 
         return _item
       })
@@ -35,7 +43,7 @@ const InverseTransformationMethod = (props) => {
   )
   const [cantidadNumeros, setCantidadNumeros] = useState(3)
   const [cantidadSimulaciones, setCantidadSimulaciones] = useState(0)
-  
+
   const [parametros, setParametros] = useState({
     funcionProbabilidad: [],
     cantidadSimulaciones: 0,
@@ -46,29 +54,45 @@ const InverseTransformationMethod = (props) => {
     () => {
       const schema = {}
       for (let i = 0; i < cantidadNumeros; i++) {
-        schema[`p_${i}`] = NumberType("Requerido").range(0, 1, "Debe estar entre 0 y 1")
-          .isRequired("Requerido")
-        schema[`x_${i}`] = NumberType("Requerido").isRequired("Requerido")
+        schema[`p_${i}`] = NumberType(T[locale].errors.forms.numeric)
+          .range(0, 1, T[locale].errors.forms.number.probabilityExclusive)
+          .addRule(v => 0 < v && v < 1, T[locale].errors.forms.number.probabilityExclusive)
+          .isRequired(T[locale].errors.forms.required)
+        schema[`x_${i}`] = NumberType(T[locale].errors.forms.numeric)
+          .isRequired(T[locale].errors.forms.required)
       }
       return SchemaModel(schema)
     }, 
     [cantidadNumeros]
   )
   const [erroresFormulario, setErroresFormulario] = useState({
-    cantidadSimulaciones: "Requerido",
+    cantidadSimulaciones: T[locale].errors.forms.required,
   });
   const [erroresFuncionProbabilidad, setErroresFuncionProbabilidad] = useState([
-    { p: "Requerido", x: "Requerido" },
-    { p: "Requerido", x: "Requerido" },
-    { p: "Requerido", x: "Requerido" },
+    { 
+      p: T[locale].errors.forms.required, 
+      x: T[locale].errors.forms.required 
+    },
+    { 
+      p: T[locale].errors.forms.required, 
+      x: T[locale].errors.forms.required 
+    },
+    { 
+      p: T[locale].errors.forms.required, 
+      x: T[locale].errors.forms.required 
+    },
   ])
   const erroresFuncionProbabilidadVista = useMemo(
     () => erroresFuncionProbabilidad
       .map((item, index) => {
         const _item = {}
 
-        if (item.p) { _item[`p_${index}`] = item.p }
-        if (item.x) { _item[`x_${index}`] = item.x }
+        if (item.p) { 
+          _item[`p_${index}`] = item.p
+        }
+        if (item.x) { 
+          _item[`x_${index}`] = item.x
+        }
 
         return _item
       })
@@ -88,26 +112,28 @@ const InverseTransformationMethod = (props) => {
     },
     [funcionProbabilidad]
   )
+
+  const SimInfo = T[locale].simulators.inverseTransformationMethod;
   const validacioesAdicionales = useMemo(() => {
     const validaciones =
       [
         {
           criterio: () => sumatoriaProbabilidades === 1,
-          mensaje: "La suma de las probabilidades (P) debe ser igual a 1.",
+          mensaje: SimInfo.T.allFieldsMustBeCorrect,
         },
         {
           criterio: () => erroresFormulario.cantidadSimulaciones === undefined
             && erroresFuncionProbabilidad.reduce(
               (total, pair) => total + Object.entries(pair).length, 0
           ) === 0,
-          mensaje: "Debe llenar todos los campos de manera correcta.",
+          mensaje: SimInfo.T.sumOfProbEqual1,
         },
         {
           criterio: () => {
             const valores_x = funcionProbabilidad.map(v => v.x).filter(x => x).sort()
             return valores_x.findIndex((x, i) => x === valores_x[i - 1]) === -1
           },
-          mensaje: "No puede haber 2 valores de X iguales.",
+          mensaje: SimInfo.T.NoTwoSameValues,
         },
       ]
     return validaciones.map(regla => !regla.criterio() && regla.mensaje).filter(error => error)
@@ -142,9 +168,7 @@ const InverseTransformationMethod = (props) => {
       })
     })
   }
-  //#endregion
 
-  const { query } = useRouter()
   const schemaModelValidator = useSchemaModelValidator({
     x: StringType().isRequired().addRule(v => /^(-?(\d+(\.\d+)?))(,-?(\d+(\.\d+)?))*$/gm.test(v)),
     p: StringType().isRequired().addRule(v => /^((0(\.\d+)?))(,(0(\.\d+)?))*$/gm.test(v)),
@@ -192,7 +216,7 @@ const InverseTransformationMethod = (props) => {
   }, [query])
 
   return (
-    <BaseLayout title={META.title} rightContent={<Description />}>
+    <BaseLayout title={SimInfo.META.title} rightContent={<SimInfo.Description />}>
       <Form
         formValue={{cantidadSimulaciones}}
         formError={erroresFormulario}
@@ -210,7 +234,7 @@ const InverseTransformationMethod = (props) => {
         }}
       >
         <Form.Group controlId="cantidadSimulaciones">
-          <Form.ControlLabel>Número de simulaciones</Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.numSimulations}</Form.ControlLabel>
           <Form.Control accepter={InputNumber} min={1} name="cantidadSimulaciones" />
         </Form.Group>
       </Form>
@@ -257,8 +281,8 @@ const InverseTransformationMethod = (props) => {
       >
         <ResponsiveTable 
           columns={[
-            { title: "Probabilidad", }, 
-            { title: "Valor x", },
+            { title: <>{T[locale].fields.probabolity} <Latex>$p$</Latex></>, },
+            { title: <>{T[locale].fields.value} <Latex>$x$</Latex></>, },
             { title: <i className="bi bi-list" />, },
           ]}
           rows={Array(cantidadNumeros).fill(null)
@@ -313,10 +337,10 @@ const InverseTransformationMethod = (props) => {
         />
         {validacioesAdicionales.length > 0 && (
           <Message type="error">
-            <h4>Errores de vali                                                                   dación</h4>
+            <h4>{T[locale].validationErrors}</h4>
             <ul>{
               validacioesAdicionales.map((error) => (
-                <li key={error.hashCode()} className="derecha">{ error }</li>
+                <li key={error.substring(0,10)} className="derecha">{ error }</li>
               ))
             }</ul>
           </Message>
@@ -326,11 +350,12 @@ const InverseTransformationMethod = (props) => {
         <Button appearance="primary" disabled={validacioesAdicionales.length !== 0}
           onClick={() => calcular({funcionProbabilidad, cantidadSimulaciones})}
         >
-          Siguiente
+          {T[locale].compute}
         </Button>
       </ButtonGroup>
       {resultados.length > 0 &&
         <ResponsiveTable columns={randomNumbers.columns} rows={resultados} />
+        /* TODO Add counts */
       }
     </BaseLayout>
   );

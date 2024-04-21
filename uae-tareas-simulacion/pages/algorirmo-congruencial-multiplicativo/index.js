@@ -7,34 +7,43 @@ import { randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
 import Latex from "react-latex-next";
 import { useRouter } from "next/router";
-import { Description, META } from "../../I18n/es/simulators/MultiplicativeCongruentialAlgorithm";
+import { T } from "../../I18n";
 
 
 const MCA = () => {
+  const { query, locale } = useRouter()
+
   const _formularioLimpio = {
     a: "0",
     m: "0",
     x0: "0",
-    n: "0",
+    n: "100",
   };
   const _esquemaFormulario = SchemaModel({
-    a: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
-      .isRequired("Requerido"),
-    m: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
-      .isRequired("Requerido"),
-    x0: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
-      .isRequired("Requerido"),
-    n: NumberType("requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
-      .isInteger("Debe ser entero.").isRequired("Requerido"),
+    a: NumberType(T[locale].errors.forms.numeric)
+      .range(1, Number.MAX_SAFE_INTEGER, T[locale].errors.forms.number.positive)
+      .isInteger(T[locale].errors.forms.number.integer)
+      .isRequired(T[locale].errors.forms.required),
+    m: NumberType(T[locale].errors.forms.numeric)
+      .range(1, Number.MAX_SAFE_INTEGER, T[locale].errors.forms.number.positive)
+      .isInteger(T[locale].errors.forms.number.integer)
+      .isRequired(T[locale].errors.forms.required),
+    x0: NumberType(T[locale].errors.forms.numeric)
+      .range(1, Number.MAX_SAFE_INTEGER, T[locale].errors.forms.number.positive)
+      .isInteger(T[locale].errors.forms.number.integer)
+      .isRequired(T[locale].errors.forms.required),
+    n: NumberType(T[locale].errors.forms.numeric)
+      .range(1, Number.MAX_SAFE_INTEGER, T[locale].errors.forms.number.positive)
+      .isInteger(T[locale].errors.forms.number.integer)
+      .isRequired(T[locale].errors.forms.required),
   });
   const formulario = React.useRef();
   const [datosFormulario, setDatosFormulario] = React.useState(_formularioLimpio);
   const [parametrosAlgoritmo, setParametrosAlgoritmo] = React.useState(_formularioLimpio);
   const [erroresFormulario, setErroresFormulario] = React.useState({
-    a: "Requerido",
-    m: "Requerido",
-    x0: "Requerido",
-    n: "Requerido",
+    a: T[locale].errors.forms.required,
+    m: T[locale].errors.forms.required,
+    x0: T[locale].errors.forms.required,
   });
   const [valores_x, setValores_x] = React.useState();
   const windowSize = useWindowSize();
@@ -45,7 +54,6 @@ const MCA = () => {
     const var_x0 = Number(parametros.x0);
     const var_n = Number(parametros.n);
 
-    //const _valores_u = [{ i: 0, x: x0, u: x0/m, }]
     const _valores_x = [var_x0];
 
     for (let i = 1; i < var_n + 1; i++) {
@@ -57,16 +65,6 @@ const MCA = () => {
     setParametrosAlgoritmo(parametros)
   };
 
-  React.useEffect(() => {
-    if (formulario.current) {
-      formulario.current.check();
-    }
-    return () => {
-      formulario.current = null;
-    };
-  }, [formulario]);
-
-  const { query } = useRouter()
   useEffect(() => {
     if (Object.keys(query).length === 0)
       return;
@@ -79,8 +77,10 @@ const MCA = () => {
     }
   }, [query])
 
+
+  const SimInfo = T[locale].simulators.multiplicativeCongruentialAlgorithm;
   return (
-    <BaseLayout title={META.title} rightContent={<Description />}>
+    <BaseLayout title={SimInfo.META.title} rightContent={<SimInfo.Description />}>
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
@@ -88,26 +88,26 @@ const MCA = () => {
         onSubmit={() => calcular(datosFormulario)} ref={formulario}
       >
         <Form.Group controlId="a">
-          <Form.ControlLabel>Multiplicador <Latex>{String.raw`$\alpha$`}</Latex></Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.multiplier} <Latex>{String.raw`$\alpha$`}</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0} min={1} name="a" />
         </Form.Group>
         <Form.Group controlId="m">
-          <Form.ControlLabel>Módulo <Latex>{String.raw`$m$`}</Latex></Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.modulus} <Latex>{String.raw`$m$`}</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0} min={1} name="m" />
         </Form.Group>
         <Form.Group controlId="x0">
-          <Form.ControlLabel>Semilla <Latex>{String.raw`$x_n$`}</Latex></Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.seed} <Latex>{String.raw`$x_n$`}</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0} min={1} name="x0" />
         </Form.Group>
         <Form.Group controlId="n">
-          <Form.ControlLabel>Cantidad de números generados <Latex>{String.raw`$N$`}</Latex></Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.numSimulations} <Latex>{String.raw`$N$`}</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0} min={1} name="n" />
         </Form.Group>
         <ButtonGroup>
           <Button type="submit" appearance="primary"
             disabled={Object.entries(erroresFormulario).length > 0}
           >
-            Calcular
+            {T[locale].compute}
           </Button>
         </ButtonGroup>
       </Form>

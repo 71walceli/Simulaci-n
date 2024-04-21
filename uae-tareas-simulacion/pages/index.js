@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { SIMULADORES } from '../I18n/es/simulators'
+import { SimulatorList } from '../I18n/es/simulators'
 
 
 export default function Home() {
@@ -19,7 +19,7 @@ export default function Home() {
           Simuladores de Probabilidad
         </h1>
         <div className={styles.grid}>
-          {SIMULADORES.map(link => (
+          {SimulatorList.map(link => (
             <a key={link.url} href={link.url} className={styles.card}>
               <h2>{link.abbreviation} &rarr;</h2>
               <p>{link.title}</p>
