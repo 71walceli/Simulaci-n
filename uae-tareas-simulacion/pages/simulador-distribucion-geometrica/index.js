@@ -1,8 +1,8 @@
-import { 
-  Form, Button, ButtonGroup, InputNumber} from "rsuite"
+import { Form, Button, ButtonGroup, InputNumber } from "rsuite"
 import { NumberType, SchemaModel } from "schema-typed";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo } from "react"
+import Latex from "react-latex-next";
 
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { Accordion } from "../../Components/Accordion";
@@ -10,29 +10,33 @@ import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
 import { Description, META } from "../../I18n/es/simulators/GeometricDistribution";
-import Latex from "react-latex-next";
+import { T } from "../../I18n"
 
 
 const _20221230_1_simulador_distribucion_geometroca = (props) => {
+  const { query: _query, locale } = useRouter()
+  console.log({locale, T})
+
   const _formularioLimpio = {
     probabilidad: "0",
     noSimulaciones: "100",
   };
   const _esquemaFormulario = SchemaModel({
-    probabilidad: NumberType("Requerido").range(0, 1, "Debe ser una probabilidad válida.")
-      .addRule(v => 0 < v && v < 1, "No debe ser nula u total").isRequired("Requerido"),
-    noSimulaciones: NumberType("Requerido").range(1, Number.MAX_SAFE_INTEGER, "Debe ser positivo")
-      .isInteger("Debe ser entero.").isRequired("Requerido"),
+    probabilidad: NumberType(T[locale].errors.forms.numeric)
+      .range(0, 1, T[locale].errors.forms.number.probabilityExclusive)
+      .addRule(v => 0 < v && v < 1, T[locale].errors.forms.number.probabilityExclusive)
+      .isRequired(T[locale].errors.forms.required),
+    noSimulaciones: NumberType(T[locale].errors.forms.numeric)
+      .range(1, Number.MAX_SAFE_INTEGER, T[locale].errors.forms.number.positive)
+      .isInteger(T[locale].errors.forms.number.integer)
+      .isRequired(T[locale].errors.forms.required),
   });
-  const formulario = React.useRef();
   const [datosFormulario, setDatosFormulario] = React.useState(_formularioLimpio);
   const [parametrosAlgoritmo, setParametrosAlgoritmo] = React.useState(_formularioLimpio);
   const [resultados, setResultados] = React.useState({});
   const [erroresFormulario, setErroresFormulario] = React.useState({
-    probabilidad: "Requerido",
-    noSimulaciones: "Requerido",
+    probabilidad: T[locale].errors.forms.required,
   });
-  // TODO put ii in its own hook
   const windowSize = useWindowSize();
 
   const calcular = (parameters) => {
@@ -75,20 +79,11 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
     setResultados({ resultados, conteos })
   };
 
-  React.useEffect(() => {
-    if (formulario.current) {
-      formulario.current.check();
-    }
-    return () => {
-      formulario.current = null;
-    };
-  }, [formulario]);
-
-  const { query: _query } = useRouter()
   const query = useMemo(() => ({
     probabilidad: _query.p,
     noSimulaciones: _query.n,
   }), [_query])
+
   useEffect(() => {
     if (Object.keys(query).length === 0)
       return;
@@ -102,21 +97,23 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
   }, [query])
 
   return (
-    <BaseLayout title={META.title} rightContent={<Description />}>
+    <BaseLayout title={T[locale].simulators.geometricDistribution.META.title} 
+      rightContent={<Description />}
+    >
       <Form layout={windowSize.width > 420 && "horizontal" || "vertical"}
         formValue={datosFormulario} formError={erroresFormulario}
         model={_esquemaFormulario}
         onChange={setDatosFormulario} onCheck={setErroresFormulario}
-        onSubmit={() => calcular(datosFormulario)} ref={formulario}
+        onSubmit={() => calcular(datosFormulario)}
       >
         <Form.Group controlId="probabilidad">
-          <Form.ControlLabel>Probabilidad <Latex>$p$</Latex></Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.probabolity} <Latex>$p$</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0}
             min={0} max={1} step={0.01} name="probabilidad"
           />
         </Form.Group>
         <Form.Group controlId="noSimulaciones">
-          <Form.ControlLabel># Simulaciones</Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.numSimulations}</Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={10} min={1}
             name="noSimulaciones"
           />
@@ -125,27 +122,26 @@ const _20221230_1_simulador_distribucion_geometroca = (props) => {
           <Button type="submit" appearance="primary"
             disabled={Object.entries(erroresFormulario).length > 0}
           >
-            Calcular
+            {T[locale].compute}
           </Button>
         </ButtonGroup>
       </Form>
-      {/* TODO Hcer componente de tablas estándar */}
       {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-        <Accordion header="Distribución Geométrica" defaultExpanded>
+        <Accordion header={T[locale].probabilityFunction} defaultExpanded>
           <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
             rows={parametrosAlgoritmo.funcionProbabilidad}
           />
         </Accordion>
       )}
       {resultados?.resultados?.length > 0 && (
-        <Accordion header="Resultados de simulación" style={{ marginTop: "1em" }}>
+        <Accordion header={T[locale].simulationResults} style={{ marginTop: "1em" }}>
           <ResponsiveTable columns={randomNumbers.columns} 
             rows={resultados.resultados}
           />
         </Accordion>
       )}
       {resultados?.conteos?.length > 0 && (
-        <Accordion header="Conteo de valores" defaultExpanded style={{ marginTop: "2em" }}>
+        <Accordion header={T[locale].valuesCount} defaultExpanded style={{ marginTop: "2em" }}>
           <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
         </Accordion>
       )}

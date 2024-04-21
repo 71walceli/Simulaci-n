@@ -16,11 +16,15 @@ export function Description() {
   return <>
     <p>
       La distribución binomial es una distribución de probabilidad discreta que describe el número 
-      de éxitos en una secuencia de <Latex>$n$</Latex> ensayos independientes, donde cada ensayo 
-      tiene únicamente dos resultados posibles: éxito o fracaso. Cada ensayo se considera 
-      independiente, y la probabilidad de éxito es constante en todos los ensayos. Esta distribución
-      está parametrizada por dos parámetros: &nbsp;<Latex>$n$</Latex>, que representa el número 
-      total de ensayos, y &nbsp;<Latex>$p$</Latex>, que es la probabilidad de éxito en cada ensayo.
+      de éxitos en una secuencia de
+      <Latex>$n$</Latex>
+      ensayos independientes, donde cada ensayo tiene únicamente dos resultados posibles: éxito o 
+      fracaso. Cada ensayo se considera independiente, y la probabilidad de éxito es constante en 
+      todos los ensayos. Esta distribución está parametrizada por dos parámetros: 
+      <Latex>$n$</Latex>, 
+      que representa el número total de ensayos, y 
+      <Latex>$p$</Latex>, 
+      que es la probabilidad de éxito en cada ensayo.
     </p>
     <p>
       Fórmula:

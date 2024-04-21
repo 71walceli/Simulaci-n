@@ -5,7 +5,7 @@ import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import _ from "lodash"
 
-import { SIMULADORES } from '../I18n/es/simulators'
+import { metaList } from '../I18n/es/simulators'
 
 import 'katex/dist/katex.min.css'
 
@@ -21,18 +21,19 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
     setPlacement(content ? placement : null)
   }
 
-  const SidebarMenu = () => <Nav vertical appearance="subtle">
-    {SIMULADORES.map(s => {
-      const active = pathname === s.url
+  const SidebarMenu = () => 
+    <Nav vertical appearance="subtle">
+      {metaList.map(s => {
+        const active = pathname === s.url
 
-      return <Nav.Item key={s.url} href={s.url} as={Link} active={active}
-        style={{ flexWrap: "wrap" }}
-      >
-        <Tag color={active ? "blue" : "grey"}>{s.abbreviation}</Tag>
-        <p className="w-100">{s.title}</p>
-      </Nav.Item>
-    })}
-  </Nav>
+        return <Nav.Item key={s.url} href={s.url} as={Link} active={active}
+          style={{ flexWrap: "wrap" }}
+        >
+          <Tag color={active ? "blue" : "grey"}>{s.abbreviation}</Tag>
+          <p className="w-100">{s.title}</p>
+        </Nav.Item>
+      })}
+    </Nav>
 
   const {pathname, query} = useRouter()
   useEffect(() => handleDrawer(), [pathname, query])
@@ -42,7 +43,12 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
       <Head>
         <title>{title}</title>
       </Head>
-      <Container style={{ backgroundColor: "black",  }}>
+      <Container style={{ 
+        backgroundColor: "black", 
+        maxHeight: "calc( 100vh - 3em )",
+        height: "calc( 100vh - 3em )",
+        overflowY: "hidden",
+      }}>
         <Header className="border-bottom">
           <Nav className="d-flex w-100">
             <Nav.Item as={Link} href="/"><i className="bi bi-house"/></Nav.Item>
@@ -68,19 +74,44 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
             <Nav.Item><i className="bi bi-sliders"/></Nav.Item>
           </Nav>
         </Header>
-        <Content style={{ backgroundColor: "black",  }}>
+        <Content style={{ 
+          backgroundColor: "black",  
+          maxHeight: "calc( 100vh - 3em - 37px )",
+          height: "calc( 100vh - 3em - 37px )",
+          overflowY: "hidden",
+        }}>
           <Container>
-            <Sidebar className="d-none d-lg-block d-xl-block d-xxl-block pe-3" style={{}}>
+            <Sidebar className="d-none d-lg-block d-xl-block d-xxl-block pe-3" style={{
+              maxHeight: "calc( 100vh - 3em - 37px )",
+              height: "calc( 100vh - 3em - 37px )",
+              overflowY: "hidden",
+            }}>
               <SidebarMenu />
             </Sidebar>
-            <Content>
+            <Content style={{
+              minHeight: "calc( 100vh - 3em - 37px )",
+              height: "calc( 100vh - 3em - 37px )",
+              maxHeight: "calc( 100vh - 3em - 37px )",
+              overflowY: "hidden",
+            }}>
               <div className="mt-3 "/>
-              <div className="overflow-scroll" style={{ backgroundColor: "#222", height: "calc( 100vh - 60px - 3em )" }}>
+              <div className="overflow-scroll" style={{ 
+                backgroundColor: "#222",
+                minHeight: "calc( 100vh - 3em - 37px - 1rem )",
+                height: "calc( 100vh - 3em - 37px - 1rem )",
+                maxHeight: "calc( 100vh - 3em - 37px - 1rem )",
+              }}>
                 {children}
               </div>
             </Content>
-            <Sidebar className="d-none d-xl-block d-xxl-block ps-3 pt-2 overflow-scroll">
-              {rightContent}
+            <Sidebar className="d-none d-xl-block d-xxl-block ps-3 pt-2" style={{
+              maxHeight: "calc( 100vh - 3em - 37px )",
+              height: "calc( 100vh - 3em - 37px )",
+              overflowY: "hidden",
+            }}>
+              <div className="overflow-scroll">
+                {rightContent}
+              </div>
             </Sidebar>
           </Container>
         </Content>

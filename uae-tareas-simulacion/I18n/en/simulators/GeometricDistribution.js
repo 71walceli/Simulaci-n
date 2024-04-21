@@ -6,7 +6,7 @@ import { objectToQueryString } from "../../../misc";
 
 
 export const META = {
-  abbreviation: "Geo.",
+  abbreviation: "Geom.",
   title: "Distribución Geométrica",
   url: "/simulador-distribucion-geometrica",
 }
