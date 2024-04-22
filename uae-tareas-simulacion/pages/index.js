@@ -1,10 +1,13 @@
 import Head from 'next/head'
 import Image from 'next/image'
+
 import styles from '../styles/Home.module.css'
-import { SimulatorList } from '../I18n/es/simulators'
+import { useRouter } from 'next/router'
+import { T } from '../I18n/'
 
 
 export default function Home() {
+  const { locale } = useRouter()
 
   return (
     <div className={styles.container}>
@@ -19,7 +22,7 @@ export default function Home() {
           Simuladores de Probabilidad
         </h1>
         <div className={styles.grid}>
-          {SimulatorList.map(link => (
+          {T[locale].metaList.map(link => (
             <a key={link.url} href={link.url} className={styles.card}>
               <h2>{link.abbreviation} &rarr;</h2>
               <p>{link.title}</p>
