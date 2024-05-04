@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Latex from "react-latex-next";
+
 import { objectToQueryString } from "../../../misc";
+
 
 export const META = {
   abbreviation: "A. C. M.",
@@ -19,13 +21,13 @@ export function Description() {
       aleatorios.
     </p>
     <p>
-      La fórmula general del algoritmo congruencial multiplicativo es:
+      Fórmula:
     </p>
     <p>
       <Latex>{String.raw`$$X_{n+1} = ( \alpha \cdot x_n)\,\rm{mod}\,m$$`}</Latex>
     </p>
     <p>
-      Donde:
+      Variables:
     </p>
     <ul>
       <li><Latex>{String.raw`$x$`}</Latex>: Variable aleatoria</li>
@@ -34,17 +36,26 @@ export function Description() {
       <li><Latex>{String.raw`$\alpha$`}</Latex>: Multiplicador</li>
       <li><Latex>{String.raw`$m$`}</Latex>: Módulo</li>
     </ul>
+    <p>Indicaciones:</p>
     <p>
-      Es importante elegir valores adecuados para
-      <Latex>{String.raw`$\alpha$`}</Latex>
-      y
-      <Latex>{String.raw`$m$`}</Latex>
-      para garantizar que el algoritmo genere números pseudoaleatorios de buena calidad. Se
-      recomienda que
-      <Latex>{String.raw`$m$`}</Latex>
-      <Latex>{String.raw`$\alpha$`}</Latex>
-      tenga propiedades específicas, como no cmmpartir factores en común con este último.
+      Es importante elegir valores adecuados 
+      para <Latex>{String.raw`$\alpha$`}</Latex> y <Latex>{String.raw`$m$`}</Latex> para 
+      garantizar que el algoritmo genere números pseudoaleatorios de buena calidad. Se 
+      recomienda que <Latex>$m$</Latex> y <Latex>{String.raw`$\alpha$`}</Latex> tenga 
+      propiedades específicas, como no cmmpartir factores en común con este último.
     </p>
+    <p>Interpretación:</p>
+    <p>
+      La aplicación del algoritmo permite obtener tantos valores aleatorios como sea necesario. 
+    </p>
+    <ul>
+      <li>
+        <Latex>$x$</Latex> es un entero entre 0 y <Latex>$m$</Latex>
+      </li>
+      <li>
+        <Latex>{String.raw`$u = \frac x m$`}</Latex>
+      </li>
+    </ul>
     <p>Ejemplo:</p>
     <ul>
       <li>

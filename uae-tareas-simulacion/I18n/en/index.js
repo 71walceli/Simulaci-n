@@ -31,4 +31,5 @@ export const T = {
   simulationResults: "Simulation Results",
   valuesCount: "Values Count",
   validationErrors: "Validation errors",
+  probabilitySims: "Probability Simulators",
 }

@@ -27,10 +27,6 @@ html, body {
   max-height: 100vh;
   overflow-y: hidden;
 }
-div {
-  max-height: 100%;
-
-}
 .rs-form-horizontal {
   max-width: 600px;
   margin: auto;

@@ -1,19 +1,20 @@
 import Head from "next/head"
-import { Container, Header, Content, Sidebar, CustomProvider, Nav, Tag, Drawer } from "rsuite"
+import { Container, Header, Content, Sidebar, CustomProvider, Nav, Tag, Drawer, Whisper, Popover } from "rsuite"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import _ from "lodash"
 
-import { metaList } from '../I18n/es/simulators'
+import { LANGUAGES, T } from "../I18n"
 
 import 'katex/dist/katex.min.css'
 
 
 export const BaseLayout = ({title, children, rightContent, ...props}) => {
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [drawerContent, setDrawerContent] = useState()
-  const [placement, setPlacement] = useState()
+  const { locale, pathname, query, push } = useRouter()
+  const [ drawerOpen, setDrawerOpen ] = useState(false)
+  const [ drawerContent, setDrawerContent ] = useState()
+  const [ placement, setPlacement ] = useState()
 
   const handleDrawer = (content, placement) => {
     setDrawerOpen(Boolean(content))
@@ -23,7 +24,7 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
 
   const SidebarMenu = () => 
     <Nav vertical appearance="subtle">
-      {metaList.map(s => {
+      {T[locale].metaList.map(s => {
         const active = pathname === s.url
 
         return <Nav.Item key={s.url} href={s.url} as={Link} active={active}
@@ -35,7 +36,6 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
       })}
     </Nav>
 
-  const {pathname, query} = useRouter()
   useEffect(() => handleDrawer(), [pathname, query])
 
   return <>
@@ -72,6 +72,19 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
               <i className="bi bi-question"/>
             </Nav.Item>
             <Nav.Item><i className="bi bi-sliders"/></Nav.Item>
+            <Whisper trigger="click" placement="auto" speaker={
+              <Popover full>
+                <Nav vertical>
+                  {LANGUAGES.map(l => <Nav.Item key={l.code} 
+                    onClick={() => push(pathname, pathname, { locale: l.code })}
+                  >
+                    {l.name}
+                  </Nav.Item>)}
+                </Nav>
+              </Popover>
+            }>
+              <Nav.Item><i className="bi bi-translate"/></Nav.Item>
+            </Whisper>
           </Nav>
         </Header>
         <Content style={{ 
@@ -81,10 +94,9 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
           overflowY: "hidden",
         }}>
           <Container>
-            <Sidebar className="d-none d-lg-block d-xl-block d-xxl-block pe-3" style={{
+            <Sidebar className="d-none d-lg-block d-xl-block d-xxl-block pe-3 overflow-auto" style={{
               maxHeight: "calc( 100vh - 3em - 37px )",
               height: "calc( 100vh - 3em - 37px )",
-              overflowY: "hidden",
             }}>
               <SidebarMenu />
             </Sidebar>
@@ -95,7 +107,7 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
               overflowY: "hidden",
             }}>
               <div className="mt-3 "/>
-              <div className="overflow-scroll" style={{ 
+              <div className="overflow-auto" style={{ 
                 backgroundColor: "#222",
                 minHeight: "calc( 100vh - 3em - 37px - 1rem )",
                 height: "calc( 100vh - 3em - 37px - 1rem )",
@@ -109,7 +121,10 @@ export const BaseLayout = ({title, children, rightContent, ...props}) => {
               height: "calc( 100vh - 3em - 37px )",
               overflowY: "hidden",
             }}>
-              <div className="overflow-scroll">
+              <div className="overflow-auto" style={{
+                maxHeight: "calc( 100vh - 3em - 37px - 1rem )",
+                height: "calc( 100vh - 3em - 37px - 1rem )",
+              }}>
                 {rightContent}
               </div>
             </Sidebar>

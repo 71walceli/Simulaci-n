@@ -30,5 +30,6 @@ export const T = {
   probabilityFunction: "Función de probabilidad",
   simulationResults: "Resultados de simulación",
   valuesCount: "Conteo de valores",
-  validationErrors: "Errores de validación"
+  validationErrors: "Errores de validación",
+  probabilitySims: "Simuladores de Probabilidad",
 }
