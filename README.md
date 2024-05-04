@@ -2,7 +2,7 @@
 
 This is a Web application that specializes in simulating probability distributions using random number generation. This tool offers a set of simulators that allow you to model various distributions, which is valuable for research and data analysis. Among the distributions that can be simulated are Binomial, Poisson, and Geometric, along with the Multiplicative Congruential Algorithm and the Inverse Transform Method.
 
-See [More](https://portfolio.71walceli.beauty/?page_id=1517)
+[Read More](https://portfolio.71walceli.beauty/?page_id=1517)
 
 ## Key Features of this Application:
 - **Variety of Simulations**: Provides a wide range of options for simulating probability distributions, including Binomial, Poisson, and Geometric, as well as the specific methods of the Multiplicative Congruential Algorithm and the Inverse Transform Method.
