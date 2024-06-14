@@ -32,4 +32,8 @@ export const T = {
   valuesCount: "Conteo de valores",
   validationErrors: "Errores de validación",
   probabilitySims: "Simuladores de Probabilidad",
+  META: {
+    title: "Ciencia de Datos Simplificado: Herramienta Gratuita e Interactiva de Distribución de Probabilidad",
+    description: "¡Domina la Ciencia de datos! Esta herramienta te permite explorar diversas distribuciones de probabilidad (Binomial, Poisson, Geométrica) basadas en Números Aleatorios. Genera datos aleatorios, personaliza parámetros y visualiza resultados para una investigación profunda.",
+  }
 }
