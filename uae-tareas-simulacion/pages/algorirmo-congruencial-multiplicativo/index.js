@@ -1,13 +1,16 @@
 import { Form, Button, ButtonGroup, InputNumber } from "rsuite";
 import { NumberType, SchemaModel } from "schema-typed";
 import React, { useEffect } from "react";
+import Latex from "react-latex-next";
+import { useRouter } from "next/router";
+
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
-import Latex from "react-latex-next";
-import { useRouter } from "next/router";
 import { T } from "../../I18n";
+import { Accordion } from "../../Components/Accordion";
+import { Chart } from "../../Components/Charts";
 
 
 const MCA = () => {
@@ -112,9 +115,35 @@ const MCA = () => {
         </ButtonGroup>
       </Form>
       {valores_x &&
-        <ResponsiveTable columns={randomNumbers.columns}
-          rows={valores_x.map(x => ({ x, u: x / Number(parametrosAlgoritmo.m) }))}
-        />
+        <>
+          <Accordion header={T[locale].simulationResults} style={{ marginTop: "1em" }}>
+            <ResponsiveTable columns={randomNumbers.columns}
+              rows={valores_x.map(x => ({ x, u: x / Number(parametrosAlgoritmo.m) }))}
+            />
+          </Accordion>
+          <Accordion header={T[locale].results.graphs} style={{ marginTop: "1em" }} defaultExpanded>
+            <Chart type="Scatter" title={T[locale].simulationResults}
+              data={{
+                datasets: [{
+                  data: valores_x.map((x,i) => ({ x: i, y: x / Number(parametrosAlgoritmo.m) })),
+                  backgroundColor: "#aaa",
+                }],
+              }}
+              options={{
+                scales: {
+                  y: {
+                    title: randomNumbers.columns[0].titleTextOnly,
+                    max: 1,
+                    min: 0,
+                  },
+                  x: {
+                    title: randomNumbers.columns[1].titleTextOnly,
+                  },
+                }
+              }}
+            />
+          </Accordion>
+        </>
       }
     </BaseLayout>
   );
