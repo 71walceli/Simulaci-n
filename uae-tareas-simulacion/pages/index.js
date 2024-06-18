@@ -47,7 +47,7 @@ export default function Home({ META, _locale }) {
       <div className={`${styles.main}`}>
         <main>
           <h1 className={styles.title}>{T[locale].probabilitySims}</h1>
-          <p className="text-center text-2xl">Data Science Made Easy: Free Interactive Probability Distribution Tool</p>
+          <p className="text-center text-sm">{META.description}</p>
           <div className={styles.grid}>
             {T[locale].metaList.map(link => (
               <a key={link.url} href={link.url} className={styles.card}>
