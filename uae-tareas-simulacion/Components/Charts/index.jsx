@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   BarElement,
+  Filler,
 } from 'chart.js';
 import { Line, Bar, Scatter } from 'react-chartjs-2';
 import { endOfDay, format, startOfDay } from 'date-fns';
@@ -25,10 +26,11 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler,
 );
 
-export function Chart({type, title, data, options}) {
+export function Chart({type, title, data, options, style}) {
   if (!data) {
     return <>No hay datos</>
   }
@@ -42,9 +44,10 @@ export function Chart({type, title, data, options}) {
   }), [data, options])
 
   const chartOptions = React.useMemo(() => ({
+    ...options,
     plugins: {
       legend: {
-        position: data.length > 1 && "chartArea",
+        position: data.datasets.length > 1 && "top",
       },
       title: {
         display: Boolean(title),
@@ -78,6 +81,7 @@ export function Chart({type, title, data, options}) {
     //responsive={false}
     style={{
       minHeight: 450,
+      ...(style || {})
     }} 
   />;
 }

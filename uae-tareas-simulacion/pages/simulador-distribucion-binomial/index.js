@@ -11,6 +11,7 @@ import { ResponsiveTable } from "../../Components/ResponsiveTable";
 import { counts, probabilityDistribution, randomNumbers } from "../../data/formats";
 import { BaseLayout } from "../../Components/BaseLayout";
 import { T } from "../../I18n"
+import { Chart } from "../../Components/Charts";
 
 
 const _20221219_2_simulador_distribucion_binomial = (props) => {
@@ -51,23 +52,20 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
     const noElementos = Number(parameters.noElementos);
 
     const funcionProbabilidad = []
+    let probabilidadAcumulada = 0
     for (let i = 0; i < noElementos + 1; i++) {
       const noCombinaciones = calculate_nCr(noElementos, i);
       const probabilidad_x = noCombinaciones * probabilidad ** i * (1 - probabilidad) ** (noElementos - i)
+      probabilidadAcumulada = probabilidadAcumulada + probabilidad_x
       const asociacion = {
         i: i,
         noCombinaciones: noCombinaciones,
         probabilidad: probabilidad_x,
+        probabilidadAcumulada,
       }
       funcionProbabilidad.push(asociacion)
-    }
-    funcionProbabilidad[0].probabilidadAcumulada = funcionProbabilidad[0].probabilidad
-    for (let i = 1; i <= noElementos; i++) {
-      funcionProbabilidad[i] = {
-        ...funcionProbabilidad[i],
-        probabilidadAcumulada: 
-          funcionProbabilidad[i - 1].probabilidadAcumulada + funcionProbabilidad[i].probabilidad,
-      }
+      if (funcionProbabilidad[i].probabilidadAcumulada > 1) 
+        break
     }
     setParametrosAlgoritmo({ funcionProbabilidad })
 
@@ -123,7 +121,7 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
         onSubmit={() => calcular(datosFormulario)}
       >
         <Form.Group controlId="probabilidad">
-          <Form.ControlLabel>{T[locale].fields.probabolity} <Latex>$p$</Latex></Form.ControlLabel>
+          <Form.ControlLabel>{T[locale].fields.probability} <Latex>$p$</Latex></Form.ControlLabel>
           <Form.Control accepter={InputNumber} defaultValue={0}
             min={0} max={1} step={0.01} name="probabilidad"
           />
@@ -148,23 +146,99 @@ const _20221219_2_simulador_distribucion_binomial = (props) => {
           </Button>
         </ButtonGroup>
       </Form>
-      {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && (
-        <Accordion header={T[locale].probabilityFunction} defaultExpanded>
-          <ResponsiveTable keyField="i" columns={probabilityDistribution.columns}
+      {parametrosAlgoritmo?.funcionProbabilidad?.length > 0 && <>
+        <Chart type="Line" title={T[locale].probabilityFunction} style={{maxHeight: "80vh"}}
+          data={{
+            labels: parametrosAlgoritmo.funcionProbabilidad.map(r => r.i),
+            datasets: [
+              {
+                label: T[locale].fields.probability,
+                data:parametrosAlgoritmo.funcionProbabilidad.map(r => ({x:r.i,y:r.probabilidad})),
+                backgroundColor: "#ccf",
+                borderColor: "lightblue",
+              },
+              {
+                label: T[locale].fields.accProbability,
+                data: parametrosAlgoritmo.funcionProbabilidad.map(r => ({ 
+                  x: r.i,
+                  y: r.probabilidadAcumulada
+                })),
+                backgroundColor: "#888",
+                borderColor: "#ccc",
+                fill: true,
+              },
+            ],
+          }}
+          options={{
+            scales: {
+              x: {
+                title: randomNumbers.columns[1].titleTextOnly,
+              },
+              y: {
+                title: T[locale].fields.probability,
+              },
+            }
+          }}
+        />
+        <Accordion header={T[locale].probabilityFunction}>
+          <ResponsiveTable keyField="i" 
+            columns={T[locale].results.tables.probabilityDistribution.columns}
             rows={parametrosAlgoritmo.funcionProbabilidad}
           />
         </Accordion>
-      )}
-      {resultados?.resultados?.length > 0 && (
+      </>
+      }
+      {resultados?.resultados?.length > 0 && <>
+        <Chart type="Scatter" title={T[locale].simulationResults}
+          data={{
+            datasets: [{
+              data: resultados.resultados.map((r,i) => ({ x: i, y: r.x })),
+              backgroundColor: "#aaa",
+            }],
+          }}
+          options={{
+            scales: {
+              x: {
+                title: randomNumbers.columns[1].titleTextOnly,
+              },
+              y: {
+                title: randomNumbers.columns[0].titleTextOnly,
+              },
+            }
+          }}
+        />
         <Accordion header={T[locale].simulationResults} style={{ marginTop: "1em" }}>
           <ResponsiveTable columns={randomNumbers.columns} rows={resultados.resultados} />
         </Accordion>
-      )}
-      {resultados?.conteos?.length > 0 && (
-        <Accordion header={T[locale].valuesCount} defaultExpanded style={{ marginTop: "2em" }}>
-          <ResponsiveTable keyField="i" columns={counts.columns} rows={resultados.conteos} />
+      </>}
+      {resultados?.conteos?.length > 0 && <>
+        <Chart type="Bar" title={T[locale].valuesCount}
+          data={{
+            labels: resultados.conteos.map(r => r.i),
+            datasets: [
+              {
+                data: resultados.conteos.map(r => ({ x: r.i, y: r.conteo })),
+                backgroundColor: "#aaa",
+              }
+            ],
+          }}
+          options={{
+            scales: {
+              x: {
+                title: randomNumbers.columns[1].titleTextOnly,
+              },
+              y: {
+                title: T[locale].results.tables.counts.columns[1].title ,
+              },
+            }
+          }}
+        />
+        <Accordion header={T[locale].valuesCount} style={{ marginTop: "2em" }}>
+          <ResponsiveTable keyField="i" columns={T[locale].results.tables.counts.columns} 
+            rows={resultados.conteos} 
+          />
         </Accordion>
-      )}
+      </>}
     </BaseLayout>
   );
 };

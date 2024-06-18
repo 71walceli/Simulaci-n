@@ -1,6 +1,8 @@
+import Latex from "react-latex-next"
 import { metaList, simulators } from "./simulators"
 
 
+const accProbability = "Acc. Probability"
 export const T = {
   errors: {
     forms: {
@@ -15,7 +17,8 @@ export const T = {
     }
   },
   fields: {
-    probabolity: "Probability",
+    probability: "Probability",
+    accProbability,
     value: "Value",
     numSimulations: "# Simulations",
     average: "Average Value",
@@ -35,5 +38,41 @@ export const T = {
   META: {
     title: "Data Science Made Easy: Free Interactive Probability Distribution Tool",
     description: "Master data analysis! This tool lets you explore various probability distributions (Binomial, Poisson, Geometric) based on Random Numbers. Generate random data, customize parameters, and visualize results for in-depth research.",
+  },
+  results: {
+    graphs: "Graphs",
+    tables: {
+      probabilityDistribution: {
+        columns: [
+          {
+            title: <i><Latex>$i$</Latex></i>,
+            titleTextOnly: "i",
+            key: "i",
+          },
+          {
+            title: "Probability",
+            key: "probabilidad",
+          },
+          {
+            title: accProbability,
+            key: "probabilidadAcumulada",
+          },
+        ]
+      },
+      counts: {
+        columns: [
+          {
+            title: <Latex>$i$</Latex>,
+            titleTextOnly: "i",
+            key: "i",
+          },
+          {
+            title: "Counts",
+            key: "conteo",
+          },
+        ]
+      }
+      
+    },
   },
 }

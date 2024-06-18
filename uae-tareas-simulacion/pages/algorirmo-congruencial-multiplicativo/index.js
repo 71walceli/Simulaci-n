@@ -114,37 +114,33 @@ const MCA = () => {
           </Button>
         </ButtonGroup>
       </Form>
-      {valores_x &&
-        <>
-          <Accordion header={T[locale].simulationResults} style={{ marginTop: "1em" }}>
-            <ResponsiveTable columns={randomNumbers.columns}
-              rows={valores_x.map(x => ({ x, u: x / Number(parametrosAlgoritmo.m) }))}
-            />
-          </Accordion>
-          <Accordion header={T[locale].results.graphs} style={{ marginTop: "1em" }} defaultExpanded>
-            <Chart type="Scatter" title={T[locale].simulationResults}
-              data={{
-                datasets: [{
-                  data: valores_x.map((x,i) => ({ x: i, y: x / Number(parametrosAlgoritmo.m) })),
-                  backgroundColor: "#aaa",
-                }],
-              }}
-              options={{
-                scales: {
-                  y: {
-                    title: randomNumbers.columns[0].titleTextOnly,
-                    max: 1,
-                    min: 0,
-                  },
-                  x: {
-                    title: randomNumbers.columns[1].titleTextOnly,
-                  },
-                }
-              }}
-            />
-          </Accordion>
-        </>
-      }
+      {valores_x && <>
+        <Chart type="Scatter" title={T[locale].simulationResults}
+          data={{
+            datasets: [{
+              data: valores_x.map((x,i) => ({ x: i, y: x / Number(parametrosAlgoritmo.m) })),
+              backgroundColor: "#aaa",
+            }],
+          }}
+          options={{
+            scales: {
+              x: {
+                title: randomNumbers.columns[1].titleTextOnly,
+              },
+              y: {
+                title: randomNumbers.columns[0].titleTextOnly,
+                max: 1,
+                min: 0,
+              },
+            }
+          }}
+        />
+        <Accordion header={T[locale].simulationResults} style={{ marginTop: "1em" }}>
+          <ResponsiveTable columns={randomNumbers.columns}
+            rows={valores_x.map(x => ({ x, u: x / Number(parametrosAlgoritmo.m) }))}
+          />
+        </Accordion>
+      </>}
     </BaseLayout>
   );
 };

@@ -14,6 +14,8 @@ import { useSchemaModelValidator } from "../../controllers/useSchemaModelValidat
 import "../../utils"
 import { calcularDistribucionAcumulada } from "../../data/calcularDistribucionAcumulada"
 import { T } from "../../I18n"
+import { Accordion } from "../../Components/Accordion"
+import { Chart } from "../../Components/Charts"
 
 
 const InverseTransformationMethod = (props) => {
@@ -48,7 +50,7 @@ const InverseTransformationMethod = (props) => {
     funcionProbabilidad: [],
     cantidadSimulaciones: 0,
   })
-  const [resultados, setResultados] = useState([])
+  const [resultados, setResultados] = useState()
   
   const validadorFuncionProbabilidad = useMemo(
     () => {
@@ -159,7 +161,16 @@ const InverseTransformationMethod = (props) => {
           x: obtenerPorMetodoTransformacionInversa(funcionProbabilidad, u),
         }
       })
-      setResultados(nuevosResultados)
+      const conteos = []
+      for (let i = 0; i < funcionProbabilidad.length; i++) {
+        const x = funcionProbabilidad[i].x
+        const conteo = nuevosResultados.filter(r => r.x === x).length;
+        if (conteo > 0)
+          conteos.push({ x, conteo })
+      }
+
+      console.log({ resultados: nuevosResultados, conteos })
+      setResultados({ resultados: nuevosResultados, conteos })
 
       return ({
         ..._parametros,
@@ -182,7 +193,7 @@ const InverseTransformationMethod = (props) => {
       const pValues = query.p.split(",")
       const xValues = query.x.split(",")
 
-      const xValues_sorted = xValues.sort()
+      const xValues_sorted = [...xValues].sort()
       if (
         xValues_sorted.findIndex((x, i) => x === xValues_sorted[i - 1]) === -1
           && pValues.reduce((total, p) => total + p, 0) === 1
@@ -204,6 +215,7 @@ const InverseTransformationMethod = (props) => {
           p: Number(pValues[i]),
           x: Number(xValues[i]),
         }))
+      console.log({query, _funcionProbabilidad})
       setFuncionProbabilidad(_funcionProbabilidad)
       setCantidadNumeros(smallestLength)
       setCantidadSimulaciones(Number(query.n))
@@ -281,7 +293,7 @@ const InverseTransformationMethod = (props) => {
       >
         <ResponsiveTable 
           columns={[
-            { title: <>{T[locale].fields.probabolity} <Latex>$p$</Latex></>, },
+            { title: <>{T[locale].fields.probability} <Latex>$p$</Latex></>, },
             { title: <>{T[locale].fields.value} <Latex>$x$</Latex></>, },
             { title: <i className="bi bi-list" />, },
           ]}
@@ -353,10 +365,71 @@ const InverseTransformationMethod = (props) => {
           {T[locale].compute}
         </Button>
       </ButtonGroup>
-      {resultados.length > 0 &&
-        <ResponsiveTable columns={randomNumbers.columns} rows={resultados} />
-        /* TODO Add counts */
-      }
+      {resultados && <>
+        <Chart type="Scatter" title={T[locale].simulationResults}
+          data={{
+            datasets: [{
+              data: resultados.resultados.map((r,i) => ({ x: i, y: r.x })),
+              backgroundColor: "#aaa",
+            }],
+          }}
+          options={{
+            scales: {
+              x: {
+                title: randomNumbers.columns[1].titleTextOnly,
+              },
+              y: {
+                title: randomNumbers.columns[0].titleTextOnly,
+              },
+            }
+          }}
+        />
+        <Accordion header={T[locale].simulationResults} style={{ marginTop: "1em" }}>
+          <ResponsiveTable keyField="u" 
+            columns={[
+              randomNumbers.columns[0],
+              {
+                title: <Latex>$x$</Latex>,
+                key: "x",
+              },
+            ]} 
+            rows={resultados.resultados} 
+          />
+        </Accordion>
+        <Chart type="Bar" title={T[locale].valuesCount}
+          data={{
+            labels: resultados.conteos.map(r => r.x),
+            datasets: [
+              {
+                data: resultados.conteos.map(r => ({ x: r.x, y: r.conteo })),
+                backgroundColor: "#aaa",
+              }
+            ],
+          }}
+          options={{
+            scales: {
+              x: {
+                title: T[locale].results.tables.counts.columns[0].titleTextOnly,
+              },
+              y: {
+                title: T[locale].results.tables.counts.columns[1].title,
+              },
+            }
+          }}
+        />
+        <Accordion header={T[locale].valuesCount} style={{ marginTop: "2em" }}>
+          <ResponsiveTable keyField="i" 
+            columns={[
+              {
+                title: <Latex>$x$</Latex>,
+                key: "x",
+              },
+              T[locale].results.tables.counts.columns[1],
+            ]} 
+            rows={resultados.conteos} 
+          />
+        </Accordion>
+      </>}
     </BaseLayout>
   );
 };
