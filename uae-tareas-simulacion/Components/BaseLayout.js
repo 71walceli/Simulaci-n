@@ -7,8 +7,6 @@ import _ from "lodash"
 
 import { LANGUAGES, T } from "../I18n"
 
-import 'katex/dist/katex.min.css'
-
 
 export const BaseLayout = ({title, children, rightContent, ...props}) => {
   const { locale, pathname, query, push } = useRouter()
